@@ -1,0 +1,18 @@
+import type { HTMLAttributes, JSX } from "react";
+
+import { cn } from "@/lib/cn";
+
+export function Card({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>): JSX.Element {
+  return (
+    <div
+      className={cn(
+        "rounded-xl border border-slate-200 bg-white p-6 shadow-sm",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
