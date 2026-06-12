@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.idea/
+.turbo/
+.vscode/
+coverage/
+dist/
+node_modules/
+pnpm-debug.log*
+*.tsbuildinfo
+
+apps/backend/src/generated/
+apps/frontend/dist/
+
+postgres-data/
