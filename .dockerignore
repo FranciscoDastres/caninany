@@ -1,0 +1,7 @@
+.git
+.turbo
+**/.env
+**/coverage
+**/dist
+**/node_modules
+postgres-data
