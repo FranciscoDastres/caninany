@@ -1,0 +1,107 @@
+name: caninany
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-caninany}
+      POSTGRES_USER: ${POSTGRES_USER:-caninany}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-caninany-local-password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-caninany} -d ${POSTGRES_DB:-caninany}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - caninany
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: development
+    restart: unless-stopped
+    command:
+      [
+        "sh",
+        "-c",
+        "pnpm --filter @caninany/backend prisma:deploy && pnpm --filter @caninany/backend dev",
+      ]
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-caninany}:${POSTGRES_PASSWORD:-caninany-local-password}@db:5432/${POSTGRES_DB:-caninany}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-before-production}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      BUSINESS_TIMEZONE: ${BUSINESS_TIMEZONE:-America/Santiago}
+      BUSINESS_OPENING_HOUR: ${BUSINESS_OPENING_HOUR:-9}
+      BUSINESS_CLOSING_HOUR: ${BUSINESS_CLOSING_HOUR:-18}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    volumes:
+      - .:/workspace
+      - backend_root_node_modules:/workspace/node_modules
+      - backend_app_node_modules:/workspace/apps/backend/node_modules
+      - backend_shared_node_modules:/workspace/packages/shared/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://localhost:3000/api/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - caninany
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      target: development
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - .:/workspace
+      - frontend_root_node_modules:/workspace/node_modules
+      - frontend_app_node_modules:/workspace/apps/frontend/node_modules
+      - frontend_shared_node_modules:/workspace/packages/shared/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - caninany
+
+volumes:
+  postgres_data:
+  backend_root_node_modules:
+  backend_app_node_modules:
+  backend_shared_node_modules:
+  frontend_root_node_modules:
+  frontend_app_node_modules:
+  frontend_shared_node_modules:
+
+networks:
+  caninany:
+    driver: bridge
