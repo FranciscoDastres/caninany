@@ -79,6 +79,7 @@ services:
     restart: unless-stopped
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
+      VITE_WHATSAPP_NUMBER: ${VITE_WHATSAPP_NUMBER:-}
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${FRONTEND_PORT:-5173}:5173"

@@ -30,6 +30,8 @@ FROM base AS builder
 
 ARG VITE_API_URL=http://localhost:3000/api/v1
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_WHATSAPP_NUMBER=
+ENV VITE_WHATSAPP_NUMBER=$VITE_WHATSAPP_NUMBER
 
 COPY . .
 RUN pnpm --filter @caninany/shared build \
