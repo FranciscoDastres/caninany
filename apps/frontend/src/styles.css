@@ -2,17 +2,22 @@
 
 :root {
   font-family:
-    Inter,
+    "Avenir Next",
+    Avenir,
     ui-sans-serif,
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #17211b;
-  background: #f5f8f6;
+  color: #1d2b24;
+  background: #fffaf3;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 * {
@@ -23,6 +28,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #fffaf3;
 }
 
 button,
@@ -30,4 +36,126 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #d9a889;
+  color: #183c2d;
+}
+
+.font-display {
+  font-family:
+    Iowan Old Style,
+    Baskerville,
+    "Times New Roman",
+    ui-serif,
+    serif;
+  letter-spacing: -0.035em;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b16d4b;
+}
+
+.nav-link {
+  position: relative;
+  transition: color 180ms ease;
+}
+
+.nav-link::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.45rem;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: #c77d58;
+  border-radius: 999px;
+  transform: scaleX(0);
+  transition: transform 180ms ease;
+}
+
+.nav-link:hover {
+  color: #183c2d;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(33, 78, 59, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(33, 78, 59, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.image-reveal {
+  overflow: hidden;
+}
+
+.image-reveal img {
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.image-reveal:hover img {
+  transform: scale(1.045);
+}
+
+.form-control {
+  min-height: 3rem;
+  width: 100%;
+  border: 1px solid #d8d0c5;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  color: #29473a;
+  font-size: 0.875rem;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.form-control:focus {
+  border-color: #527762;
+  box-shadow: 0 0 0 4px rgba(82, 119, 98, 0.1);
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .float-slow {
+    animation: none;
+  }
+
+  .image-reveal img {
+    transition: none;
+  }
 }

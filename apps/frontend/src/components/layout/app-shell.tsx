@@ -1,26 +1,113 @@
+import { Menu, PawPrint, X } from "lucide-react";
 import type { JSX, PropsWithChildren } from "react";
-import { CalendarDays } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export function AppShell({ children }: PropsWithChildren): JSX.Element {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = (): void => setMenuOpen(false);
+
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <div className="min-h-screen overflow-hidden bg-[#fffaf3] text-[#1d2b24]">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/60 bg-[#fffaf3]/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8">
           <Link
             to="/"
-            className="flex items-center gap-2 font-semibold text-emerald-800"
+            className="group flex items-center gap-3"
+            onClick={closeMenu}
           >
-            <CalendarDays className="size-5" />
-            Caninany
+            <span className="grid size-11 place-items-center rounded-2xl bg-[#214e3b] text-white shadow-[0_8px_24px_rgba(33,78,59,0.2)] transition-transform group-hover:-rotate-6">
+              <PawPrint className="size-5" strokeWidth={2.2} />
+            </span>
+            <span>
+              <span className="block font-display text-2xl leading-none text-[#183c2d]">
+                Caninany
+              </span>
+              <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#b16d4b]">
+                Pet care studio
+              </span>
+            </span>
           </Link>
-          <nav className="flex gap-5 text-sm text-slate-600">
-            <Link to="/">Agendar</Link>
-            <Link to="/admin">Administración</Link>
+
+          <nav className="hidden items-center gap-8 text-sm font-semibold text-[#496057] lg:flex">
+            <a className="nav-link" href="#servicios">
+              Servicios
+            </a>
+            <a className="nav-link" href="#experiencia">
+              Experiencia
+            </a>
+            <a className="nav-link" href="#galeria">
+              Galería
+            </a>
+            <a className="nav-link" href="#opiniones">
+              Opiniones
+            </a>
           </nav>
+
+          <div className="hidden items-center gap-3 sm:flex">
+            <a
+              href="#reservar"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-[#214e3b] px-6 text-sm font-bold text-white shadow-[0_10px_30px_rgba(33,78,59,0.22)] transition hover:-translate-y-0.5 hover:bg-[#183c2d]"
+            >
+              Reservar una hora
+            </a>
+          </div>
+
+          <button
+            type="button"
+            className="grid size-11 place-items-center rounded-full border border-[#dcd6cb] bg-white text-[#214e3b] sm:hidden"
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
         </div>
+
+        {menuOpen ? (
+          <nav className="border-t border-[#e8dfd2] bg-[#fffaf3] px-5 py-5 sm:hidden">
+            <div className="grid gap-1 text-base font-semibold text-[#30473d]">
+              <a
+                className="rounded-2xl px-4 py-3 hover:bg-white"
+                href="#servicios"
+                onClick={closeMenu}
+              >
+                Servicios
+              </a>
+              <a
+                className="rounded-2xl px-4 py-3 hover:bg-white"
+                href="#experiencia"
+                onClick={closeMenu}
+              >
+                Experiencia
+              </a>
+              <a
+                className="rounded-2xl px-4 py-3 hover:bg-white"
+                href="#galeria"
+                onClick={closeMenu}
+              >
+                Galería
+              </a>
+              <a
+                className="rounded-2xl px-4 py-3 hover:bg-white"
+                href="#opiniones"
+                onClick={closeMenu}
+              >
+                Opiniones
+              </a>
+              <a
+                className="mt-2 inline-flex h-12 items-center justify-center rounded-full bg-[#214e3b] px-6 text-sm font-bold text-white"
+                href="#reservar"
+                onClick={closeMenu}
+              >
+                Reservar una hora
+              </a>
+            </div>
+          </nav>
+        ) : null}
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-10">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }
