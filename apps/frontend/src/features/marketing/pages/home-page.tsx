@@ -17,6 +17,7 @@ import type { JSX } from "react";
 import { Link } from "react-router-dom";
 
 import { AppointmentForm } from "@/features/appointments/components/appointment-form";
+import { useSiteConfiguration } from "@/features/site-configuration/hooks/use-site-configuration";
 
 import { GallerySection } from "../components/gallery-section";
 
@@ -93,12 +94,25 @@ const reviews = [
 ];
 
 export function HomePage(): JSX.Element {
+  const configuration = useSiteConfiguration();
+  const content = configuration.data ?? {
+    heroTitle: "Cuidado que se nota.",
+    heroHighlight: "Cariño que se siente.",
+    heroDescription:
+      "Baño y limpieza de oídos en un espacio tranquilo, pensado para que tu perro se sienta seguro desde que llega hasta que vuelve contigo.",
+    heroImageUrl: "/images/caninany-hero.webp",
+    servicesEyebrow: "Servicios esenciales",
+    servicesTitle: "Todo lo que necesita para sentirse increíble.",
+    servicesDescription:
+      "Una rutina simple, bien hecha y adaptada al tamaño de tu mascota.",
+  };
+
   return (
     <>
       <section className="relative min-h-[800px] px-4 pb-8 pt-24 sm:px-6 sm:pt-28">
         <div className="relative mx-auto min-h-[700px] max-w-[1500px] overflow-hidden rounded-[2rem] bg-[#e9e3d8] sm:rounded-[3rem]">
           <img
-            src="/images/caninany-hero.webp"
+            src={content.heroImageUrl}
             alt="Golden retriever feliz después de su baño"
             className="absolute inset-0 size-full object-cover object-[65%_center]"
           />
@@ -111,15 +125,13 @@ export function HomePage(): JSX.Element {
               Bienestar con cariño
             </div>
             <h1 className="font-display text-5xl leading-[0.96] text-[#183c2d] sm:text-7xl lg:text-[5.6rem]">
-              Cuidado que se nota.
+              {content.heroTitle}
               <span className="block text-[#b96f4b]">
-                Cariño que se siente.
+                {content.heroHighlight}
               </span>
             </h1>
             <p className="mt-7 max-w-xl text-lg leading-8 text-[#52665c] sm:text-xl">
-              Baño y limpieza de oídos en un espacio tranquilo, pensado para que
-              tu perro se sienta seguro desde que llega hasta que vuelve
-              contigo.
+              {content.heroDescription}
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a
@@ -191,12 +203,12 @@ export function HomePage(): JSX.Element {
       <section id="servicios" className="px-5 py-20 sm:px-8 lg:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="eyebrow">Servicios esenciales</p>
+            <p className="eyebrow">{content.servicesEyebrow}</p>
             <h2 className="mt-5 font-display text-5xl leading-[1.02] text-[#183c2d] sm:text-6xl">
-              Todo lo que necesita para sentirse increíble.
+              {content.servicesTitle}
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[#6b7971]">
-              Una rutina simple, bien hecha y adaptada al tamaño de tu mascota.
+              {content.servicesDescription}
             </p>
           </div>
 
@@ -473,7 +485,7 @@ export function HomePage(): JSX.Element {
               <a href="#experiencia">Experiencia</a>
               <a href="#galeria">Galería</a>
               <a href="#reservar">Reservar</a>
-              <Link to="/admin">Acceso equipo</Link>
+              <Link to="/ingresar">Acceso usuarios</Link>
             </div>
           </div>
           <div className="flex flex-col gap-3 pt-7 text-xs text-[#82988d] sm:flex-row sm:justify-between">
