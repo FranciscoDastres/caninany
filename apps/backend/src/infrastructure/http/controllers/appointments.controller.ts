@@ -16,6 +16,8 @@ import {
 
 import { CreateAppointmentUseCase } from "../../../application/use-cases/create-appointment.use-case";
 import { GetAvailableSlotsUseCase } from "../../../application/use-cases/get-available-slots.use-case";
+import type { AuthenticatedUser } from "../../auth/authenticated-user";
+import { CurrentUser } from "../../auth/current-user.decorator";
 import { JwtAuthGuard } from "../../auth/jwt-auth.guard";
 import { Roles } from "../../auth/roles.decorator";
 import { RolesGuard } from "../../auth/roles.guard";
@@ -40,15 +42,16 @@ export class AppointmentsController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "client")
+  @Roles("admin", "cliente")
   @ApiBearerAuth()
   @ApiCreatedResponse({ description: "Appointment created." })
   create(
     @Body(new ZodValidationPipe(createAppointmentSchema))
     input: CreateAppointmentInput,
+    @CurrentUser() user: AuthenticatedUser,
   ): Promise<AppointmentDto> {
     return this.createAppointment.execute({
-      customerId: input.customerId,
+      customerId: user.role === "admin" ? input.customerId : user.id,
       petId: input.petId,
       petWeightKg: input.petWeightKg,
       service: input.service,

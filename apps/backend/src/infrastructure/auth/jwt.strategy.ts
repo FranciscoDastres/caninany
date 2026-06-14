@@ -11,7 +11,9 @@ import type {
 interface JwtPayload {
   sub: string;
   email: string;
+  name: string;
   role: string;
+  userId?: string;
 }
 
 @Injectable()
@@ -26,13 +28,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload: JwtPayload): AuthenticatedUser {
     const role = payload.role.toLowerCase();
-    if (role !== "admin" && role !== "client") {
+    if (role !== "admin" && role !== "cliente") {
       throw new UnauthorizedException("Invalid user role.");
     }
 
     return {
-      id: payload.sub,
+      id: payload.userId ?? payload.sub,
       email: payload.email,
+      name: payload.name,
       role: role as AuthenticatedRole,
     };
   }
