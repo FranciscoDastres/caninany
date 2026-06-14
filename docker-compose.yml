@@ -35,7 +35,7 @@ services:
       [
         "sh",
         "-c",
-        "pnpm --filter @caninany/backend prisma:deploy && pnpm --filter @caninany/backend dev",
+        "pnpm --filter @caninany/shared build && pnpm --filter @caninany/backend prisma:deploy && pnpm --filter @caninany/backend prisma:generate && mkdir -p apps/backend/dist && chown -R ${LOCAL_UID:-1000}:${LOCAL_GID:-1000} packages/shared/dist apps/backend/src/generated apps/backend/dist && cd apps/backend && exec setpriv --reuid=${LOCAL_UID:-1000} --regid=${LOCAL_GID:-1000} --clear-groups ./node_modules/.bin/nest start --watch",
       ]
     environment:
       NODE_ENV: development
