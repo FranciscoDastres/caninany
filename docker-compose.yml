@@ -35,7 +35,7 @@ services:
       [
         "sh",
         "-c",
-        "pnpm --filter @caninany/shared build && pnpm --filter @caninany/backend prisma:deploy && pnpm --filter @caninany/backend prisma:generate && mkdir -p apps/backend/dist && chown -R ${LOCAL_UID:-1000}:${LOCAL_GID:-1000} packages/shared/dist apps/backend/src/generated apps/backend/dist && cd apps/backend && exec setpriv --reuid=${LOCAL_UID:-1000} --regid=${LOCAL_GID:-1000} --clear-groups ./node_modules/.bin/nest start --watch",
+        "CI=true pnpm install --store-dir /pnpm/store --offline --frozen-lockfile && pnpm --filter @caninany/shared build && pnpm --filter @caninany/backend prisma:deploy && pnpm --filter @caninany/backend prisma:generate && mkdir -p apps/backend/dist && chown -R ${LOCAL_UID:-1000}:${LOCAL_GID:-1000} packages/shared/dist apps/backend/src/generated apps/backend/dist && cd apps/backend && exec setpriv --reuid=${LOCAL_UID:-1000} --regid=${LOCAL_GID:-1000} --clear-groups ./node_modules/.bin/nest start --watch",
       ]
     environment:
       NODE_ENV: development
@@ -83,6 +83,12 @@ services:
       dockerfile: apps/frontend/Dockerfile
       target: development
     restart: unless-stopped
+    command:
+      [
+        "sh",
+        "-c",
+        "CI=true pnpm install --store-dir /pnpm/store --offline --frozen-lockfile && exec pnpm --filter @caninany/frontend dev",
+      ]
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
       VITE_WHATSAPP_NUMBER: ${VITE_WHATSAPP_NUMBER:-}

@@ -84,6 +84,29 @@ Además:
 - Las respuestas mayores a 1 KiB se comprimen.
 - Swagger no genera el documento en producción, reduciendo arranque y memoria.
 
+## TTFB real con Docker y PostgreSQL
+
+Medición local posterior a la refactorización, con Docker Desktop, PostgreSQL 17
+y el backend NestJS en modo desarrollo. Cada muestra caliente contiene 50
+solicitudes secuenciales mediante `curl --compressed`.
+
+| Endpoint              | Promedio |      p50 |      p95 |   Máximo |
+| --------------------- | -------: | -------: | -------: | -------: |
+| Calendario de citas   | 11,34 ms | 10,64 ms | 15,10 ms | 42,37 ms |
+| Configuración pública |  3,69 ms |  2,57 ms | 10,10 ms | 12,03 ms |
+| Health check          |  3,71 ms |  3,03 ms |  8,69 ms |  9,01 ms |
+
+Primera lectura después de reiniciar el backend:
+
+- Configuración pública: `8,70 ms`.
+- Calendario de citas: `35,70 ms`.
+- Backend disponible: `15,2 s`, incluyendo migraciones, generación de Prisma y
+  compilación watch de desarrollo.
+
+La respuesta del calendario, de aproximadamente 54 kB sin comprimir, se entrega
+con Brotli cuando el cliente lo acepta. La configuración pública expone
+`Cache-Control: public, max-age=60, stale-while-revalidate=300`.
+
 ## Verificación
 
 ```bash
