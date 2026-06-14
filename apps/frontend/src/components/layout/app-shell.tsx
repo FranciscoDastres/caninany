@@ -1,12 +1,22 @@
-import { Menu, PawPrint, X } from "lucide-react";
+import { LogOut, Menu, PawPrint, UserRound, X } from "lucide-react";
 import type { JSX, PropsWithChildren } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import { useAuthStore } from "@/store/auth.store";
 
 export function AppShell({ children }: PropsWithChildren): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
 
   const closeMenu = (): void => setMenuOpen(false);
+  const logoutAndReturnHome = (): void => {
+    logout();
+    closeMenu();
+    navigate("/");
+  };
 
   return (
     <div className="min-h-screen overflow-hidden bg-[#fffaf3] text-[#1d2b24]">
@@ -46,6 +56,32 @@ export function AppShell({ children }: PropsWithChildren): JSX.Element {
           </nav>
 
           <div className="hidden items-center gap-3 sm:flex">
+            {user ? (
+              <>
+                <Link
+                  to={user.role === "admin" ? "/admin" : "/perfil"}
+                  className="inline-flex h-11 items-center gap-2 rounded-full border border-[#d8d0c5] bg-white px-4 text-sm font-bold text-[#214e3b]"
+                >
+                  <UserRound className="size-4" />
+                  {user.role === "admin" ? "Administración" : "Mi perfil"}
+                </Link>
+                <button
+                  type="button"
+                  className="grid size-11 place-items-center rounded-full border border-[#d8d0c5] bg-white text-[#214e3b]"
+                  aria-label="Cerrar sesión"
+                  onClick={logoutAndReturnHome}
+                >
+                  <LogOut className="size-4" />
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/ingresar"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-[#d8d0c5] bg-white px-5 text-sm font-bold text-[#214e3b]"
+              >
+                Ingresar
+              </Link>
+            )}
             <a
               href="#reservar"
               className="inline-flex h-12 items-center justify-center rounded-full bg-[#214e3b] px-6 text-sm font-bold text-white shadow-[0_10px_30px_rgba(33,78,59,0.22)] transition hover:-translate-y-0.5 hover:bg-[#183c2d]"
@@ -103,6 +139,32 @@ export function AppShell({ children }: PropsWithChildren): JSX.Element {
               >
                 Reservar una hora
               </a>
+              {user ? (
+                <>
+                  <Link
+                    className="mt-2 rounded-2xl bg-white px-4 py-3 text-center"
+                    to={user.role === "admin" ? "/admin" : "/perfil"}
+                    onClick={closeMenu}
+                  >
+                    {user.role === "admin" ? "Administración" : "Mi perfil"}
+                  </Link>
+                  <button
+                    type="button"
+                    className="rounded-2xl px-4 py-3 text-left text-[#9a4f34]"
+                    onClick={logoutAndReturnHome}
+                  >
+                    Cerrar sesión
+                  </button>
+                </>
+              ) : (
+                <Link
+                  className="mt-2 rounded-2xl bg-white px-4 py-3 text-center"
+                  to="/ingresar"
+                  onClick={closeMenu}
+                >
+                  Ingresar
+                </Link>
+              )}
             </div>
           </nav>
         ) : null}
