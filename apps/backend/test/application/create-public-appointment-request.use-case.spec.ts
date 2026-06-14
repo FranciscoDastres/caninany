@@ -31,7 +31,8 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
   it("persists public contact data as a pending appointment", async () => {
     const persisted: Appointment[] = [];
     const appointments: AppointmentRepository = {
-      findOverlapping: vi.fn(async () => []),
+      findBusyPeriods: vi.fn(async () => []),
+      hasActiveOverlap: vi.fn(async () => false),
       save: vi.fn(async (appointment) => {
         persisted.push(appointment);
       }),
@@ -69,16 +70,9 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
   });
 
   it("rejects a public request that overlaps an existing appointment", async () => {
-    const existing = Appointment.create({
-      id: "existing",
-      customerId: "customer",
-      petId: "pet",
-      service: "bath",
-      startsAt: new Date("2026-06-20T13:00:00.000Z"),
-      durationMinutes: 60,
-    });
     const appointments: AppointmentRepository = {
-      findOverlapping: vi.fn(async () => [existing]),
+      findBusyPeriods: vi.fn(async () => []),
+      hasActiveOverlap: vi.fn(async () => true),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
@@ -100,7 +94,8 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
 
   it("rejects requests outside the configured schedule", async () => {
     const appointments: AppointmentRepository = {
-      findOverlapping: vi.fn(async () => []),
+      findBusyPeriods: vi.fn(async () => []),
+      hasActiveOverlap: vi.fn(async () => false),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
@@ -117,13 +112,14 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
         startsAt: "2026-06-20T12:30:00.000Z",
       }),
     ).rejects.toBeInstanceOf(AppointmentOutsideBusinessHoursError);
-    expect(appointments.findOverlapping).not.toHaveBeenCalled();
+    expect(appointments.hasActiveOverlap).not.toHaveBeenCalled();
     expect(appointments.save).not.toHaveBeenCalled();
   });
 
   it("rejects requests outside the 30-minute slot grid", async () => {
     const appointments: AppointmentRepository = {
-      findOverlapping: vi.fn(async () => []),
+      findBusyPeriods: vi.fn(async () => []),
+      hasActiveOverlap: vi.fn(async () => false),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
@@ -140,7 +136,7 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
         startsAt: "2026-06-20T13:15:00.000Z",
       }),
     ).rejects.toBeInstanceOf(AppointmentOutsideBusinessHoursError);
-    expect(appointments.findOverlapping).not.toHaveBeenCalled();
+    expect(appointments.hasActiveOverlap).not.toHaveBeenCalled();
     expect(appointments.save).not.toHaveBeenCalled();
   });
 });

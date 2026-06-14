@@ -7,6 +7,7 @@
     "build": "tsc -b && vite build",
     "dev": "vite --host 0.0.0.0",
     "lint": "eslint src",
+    "performance:check": "node scripts/check-bundle-size.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc -b --pretty false"
@@ -15,10 +16,7 @@
     "@caninany/shared": "workspace:*",
     "@hookform/resolvers": "5.4.0",
     "@tanstack/react-query": "5.101.0",
-    "axios": "1.17.0",
-    "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
-    "date-fns": "4.4.0",
     "lucide-react": "1.17.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",

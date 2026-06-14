@@ -23,7 +23,7 @@ export interface AvailableSlotsDto {
   slots: string[];
 }
 
-export type AppointmentSlotStatus = "available" | "occupied" | "past";
+export type AppointmentSlotStatus = "available" | "occupied";
 
 export interface AppointmentCalendarSlotDto {
   startsAt: string;

@@ -17,6 +17,18 @@ import { useAppointmentCalendar } from "../hooks/use-appointment-calendar";
 
 const WEEKDAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 const MAX_MONTH_OFFSET = 5;
+const MONTH_FORMATTER = new Intl.DateTimeFormat("es-CL", {
+  month: "long",
+  year: "numeric",
+});
+const LONG_DATE_FORMATTER = new Intl.DateTimeFormat("es-CL", {
+  timeZone: "UTC",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+const timeFormatters = new Map<string, Intl.DateTimeFormat>();
+const selectedDateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
 
 interface AppointmentCalendarProps {
   error?: string | undefined;
@@ -328,35 +340,33 @@ function DaySchedule({
           </span>
         </div>
         <div className="mt-3 grid max-h-72 grid-cols-2 gap-2 overflow-y-auto pr-1">
-          {day.slots
-            .filter((slot) => slot.status !== "past")
-            .map((slot) => {
-              const selected = selectedStartsAt === slot.startsAt;
-              const available = slot.status === "available";
+          {day.slots.map((slot) => {
+            const selected = selectedStartsAt === slot.startsAt;
+            const available = slot.status === "available";
 
-              return (
-                <button
-                  key={slot.startsAt}
-                  type="button"
-                  disabled={!available}
-                  className={`rounded-xl border px-3 py-3 text-left transition ${
-                    selected
-                      ? "border-[#214e3b] bg-[#214e3b] text-white"
-                      : available
-                        ? "border-[#d7e2d8] bg-[#f4f8f2] text-[#315f49] hover:border-[#73917d]"
-                        : "border-[#ead8cc] bg-[#fbf1eb] text-[#a46b51]"
-                  }`}
-                  onClick={() => onSelect(slot.startsAt)}
-                >
-                  <span className="block text-sm font-extrabold">
-                    {formatTimeRange(slot.startsAt, slot.endsAt, timeZone)}
-                  </span>
-                  <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.08em] opacity-75">
-                    {available ? "Disponible" : "Pedido"}
-                  </span>
-                </button>
-              );
-            })}
+            return (
+              <button
+                key={slot.startsAt}
+                type="button"
+                disabled={!available}
+                className={`rounded-xl border px-3 py-3 text-left transition ${
+                  selected
+                    ? "border-[#214e3b] bg-[#214e3b] text-white"
+                    : available
+                      ? "border-[#d7e2d8] bg-[#f4f8f2] text-[#315f49] hover:border-[#73917d]"
+                      : "border-[#ead8cc] bg-[#fbf1eb] text-[#a46b51]"
+                }`}
+                onClick={() => onSelect(slot.startsAt)}
+              >
+                <span className="block text-sm font-extrabold">
+                  {formatTimeRange(slot.startsAt, slot.endsAt, timeZone)}
+                </span>
+                <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.08em] opacity-75">
+                  {available ? "Disponible" : "Pedido"}
+                </span>
+              </button>
+            );
+          })}
         </div>
         {day.availableCount === 0 ? (
           <p className="mt-4 rounded-xl bg-[#fbf1eb] px-4 py-3 text-sm font-semibold text-[#965a3d]">
@@ -402,20 +412,14 @@ function getFirstDayOffset(month: string): number {
 
 function formatMonth(month: string): string {
   const [year, monthNumber] = month.split("-").map(Number);
-  return new Intl.DateTimeFormat("es-CL", {
-    month: "long",
-    year: "numeric",
-  }).format(new Date(year ?? 0, (monthNumber ?? 1) - 1, 1));
+  return MONTH_FORMATTER.format(new Date(year ?? 0, (monthNumber ?? 1) - 1, 1));
 }
 
 function formatLongDate(date: string): string {
   const [year, month, day] = date.split("-").map(Number);
-  return new Intl.DateTimeFormat("es-CL", {
-    timeZone: "UTC",
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1)));
+  return LONG_DATE_FORMATTER.format(
+    new Date(Date.UTC(year ?? 0, (month ?? 1) - 1, day ?? 1)),
+  );
 }
 
 function formatTimeRange(
@@ -423,23 +427,39 @@ function formatTimeRange(
   endsAt: string,
   timeZone: string,
 ): string {
-  const formatter = new Intl.DateTimeFormat("es-CL", {
-    timeZone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  const formatter = getTimeFormatter(timeZone);
   return `${formatter.format(new Date(startsAt))}–${formatter.format(new Date(endsAt))}`;
 }
 
 function formatSelectedDateTime(startsAt: string, timeZone: string): string {
-  return new Intl.DateTimeFormat("es-CL", {
-    timeZone,
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(startsAt));
+  let formatter = selectedDateTimeFormatters.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("es-CL", {
+      timeZone,
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    selectedDateTimeFormatters.set(timeZone, formatter);
+  }
+
+  return formatter.format(new Date(startsAt));
+}
+
+function getTimeFormatter(timeZone: string): Intl.DateTimeFormat {
+  let formatter = timeFormatters.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("es-CL", {
+      timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    timeFormatters.set(timeZone, formatter);
+  }
+
+  return formatter;
 }

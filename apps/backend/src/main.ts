@@ -3,6 +3,7 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import compression from "compression";
 import helmet from "helmet";
 
 import { AppModule } from "./app.module";
@@ -24,19 +25,22 @@ async function bootstrap(): Promise<void> {
     origin: origins,
   });
   app.use(helmet());
+  app.use(compression({ threshold: 1024 }));
   app.enableShutdownHooks();
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle("Caninany API")
-    .setDescription("API for veterinary hygiene appointment scheduling.")
-    .setVersion("1.0")
-    .addBearerAuth()
-    .build();
-  SwaggerModule.setup(
-    "api/docs",
-    app,
-    SwaggerModule.createDocument(app, swaggerConfig),
-  );
+  if (config.getOrThrow<string>("NODE_ENV") !== "production") {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle("Caninany API")
+      .setDescription("API for veterinary hygiene appointment scheduling.")
+      .setVersion("1.0")
+      .addBearerAuth()
+      .build();
+    SwaggerModule.setup(
+      "api/docs",
+      app,
+      SwaggerModule.createDocument(app, swaggerConfig),
+    );
+  }
 
   await app.listen(config.getOrThrow<number>("PORT"), "0.0.0.0");
 }

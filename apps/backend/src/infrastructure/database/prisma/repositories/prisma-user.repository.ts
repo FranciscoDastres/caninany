@@ -9,6 +9,7 @@ import type {
   CreateUserRecord,
   UserRecord,
   UserRepository,
+  UserSummaryRecord,
 } from "../../../../domain/repositories/user.repository";
 import { PrismaService } from "../prisma.service";
 
@@ -63,20 +64,34 @@ export class PrismaUserRepository implements UserRepository {
     return user ? this.toDomain(user) : null;
   }
 
-  async list(): Promise<UserRecord[]> {
+  async list(): Promise<UserSummaryRecord[]> {
     return (
       await this.prisma.user.findMany({
         orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+        },
       })
-    ).map((user) => this.toDomain(user));
+    ).map((user) => this.toSummary(user));
   }
 
-  async updateRole(id: string, role: UserRole): Promise<UserRecord> {
+  async updateRole(id: string, role: UserRole): Promise<UserSummaryRecord> {
     try {
-      return this.toDomain(
+      return this.toSummary(
         await this.prisma.user.update({
           where: { id },
           data: { role: roleToPersistence[role] },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+          },
         }),
       );
     } catch (error) {
@@ -90,6 +105,22 @@ export class PrismaUserRepository implements UserRepository {
       }
       throw error;
     }
+  }
+
+  private toSummary(user: {
+    createdAt: Date;
+    email: string;
+    id: string;
+    name: string;
+    role: "ADMIN" | "CLIENT";
+  }): UserSummaryRecord {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: roleToDomain[user.role],
+      createdAt: user.createdAt,
+    };
   }
 
   private toDomain(user: {

@@ -16,6 +16,16 @@ export class PrismaSiteConfigurationRepository implements SiteConfigurationRepos
   async find(): Promise<SiteConfigurationDto | null> {
     const configuration = await this.prisma.siteConfiguration.findUnique({
       where: { id: CONFIGURATION_ID },
+      select: {
+        heroTitle: true,
+        heroHighlight: true,
+        heroDescription: true,
+        heroImageUrl: true,
+        servicesEyebrow: true,
+        servicesTitle: true,
+        servicesDescription: true,
+        updatedAt: true,
+      },
     });
     return configuration ? this.toDto(configuration) : null;
   }

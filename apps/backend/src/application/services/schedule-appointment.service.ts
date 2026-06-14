@@ -15,7 +15,6 @@ import {
 } from "../../domain/errors/domain.error";
 import type { AppointmentRepository } from "../../domain/repositories/appointment.repository";
 import { AppointmentDurationPolicy } from "../../domain/services/appointment-duration.policy";
-import { ScheduleConflictService } from "../../domain/services/schedule-conflict.service";
 import { PetWeight } from "../../domain/value-objects/pet-weight";
 
 export interface ScheduleAppointmentCommand {
@@ -52,18 +51,7 @@ export class ScheduleAppointmentService {
     );
     this.validateBusinessHours(command.startsAt, endsAt);
 
-    const existing = await this.appointments.findOverlapping(
-      command.startsAt,
-      endsAt,
-    );
-
-    if (
-      ScheduleConflictService.hasConflict(
-        command.startsAt,
-        durationMinutes,
-        existing,
-      )
-    ) {
+    if (await this.appointments.hasActiveOverlap(command.startsAt, endsAt)) {
       throw new AppointmentConflictError(
         "La hora acaba de ser tomada. Selecciona otro bloque disponible.",
       );

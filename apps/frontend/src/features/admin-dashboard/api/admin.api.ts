@@ -40,7 +40,6 @@ export async function uploadSiteImage(file: File): Promise<UploadedImageDto> {
   const response = await httpClient.post<UploadedImageDto>(
     "/configuracion-sitio/imagenes",
     formData,
-    { headers: { "Content-Type": "multipart/form-data" } },
   );
   return response.data;
 }

@@ -40,7 +40,7 @@ export class GetAppointmentCalendarUseCase {
     const nextMonth = nextMonthDate.toISOString().slice(0, 7);
     const rangeStart = this.calendar.getBusinessDay(firstDate).dayStart;
     const rangeEnd = this.calendar.getBusinessDay(`${nextMonth}-01`).dayStart;
-    const existing = await this.appointments.findOverlapping(
+    const busyPeriods = await this.appointments.findBusyPeriods(
       rangeStart,
       rangeEnd,
     );
@@ -49,6 +49,18 @@ export class GetAppointmentCalendarUseCase {
       PetWeight.create(query.petWeightKg),
     );
     const now = this.clock.now();
+    const busyPeriodsByDate = new Map<string, (typeof busyPeriods)[number][]>();
+
+    for (const period of busyPeriods) {
+      const date = this.calendar.getDateForInstant(period.startsAt);
+      const periodsForDate = busyPeriodsByDate.get(date);
+
+      if (periodsForDate) {
+        periodsForDate.push(period);
+      } else {
+        busyPeriodsByDate.set(date, [period]);
+      }
+    }
 
     return {
       month: query.month,
@@ -60,8 +72,8 @@ export class GetAppointmentCalendarUseCase {
         return buildDayAvailability({
           date,
           businessDay: this.calendar.getBusinessDay(date),
+          busyPeriods: busyPeriodsByDate.get(date) ?? [],
           durationMinutes,
-          existing,
           now,
         });
       }),

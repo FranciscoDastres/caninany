@@ -1,12 +1,9 @@
 import type { UpdateUserRoleInput, UserSummaryDto } from "@caninany/shared";
 
-import {
-  CannotChangeOwnRoleError,
-  UserNotFoundError,
-} from "../../domain/errors/domain.error";
+import { CannotChangeOwnRoleError } from "../../domain/errors/domain.error";
 import type {
-  UserRecord,
   UserRepository,
+  UserSummaryRecord,
 } from "../../domain/repositories/user.repository";
 
 export class AdminUsersService {
@@ -27,14 +24,10 @@ export class AdminUsersService {
       );
     }
 
-    if (!(await this.users.findById(targetUserId))) {
-      throw new UserNotFoundError("El usuario no existe.");
-    }
-
     return this.toDto(await this.users.updateRole(targetUserId, input.role));
   }
 
-  private toDto(user: UserRecord): UserSummaryDto {
+  private toDto(user: UserSummaryRecord): UserSummaryDto {
     return {
       id: user.id,
       email: user.email,

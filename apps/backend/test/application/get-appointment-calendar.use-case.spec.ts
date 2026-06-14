@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from "vitest";
 import type { BusinessCalendar } from "../../src/application/ports/business-calendar.port";
 import type { Clock } from "../../src/application/ports/clock.port";
 import { GetAppointmentCalendarUseCase } from "../../src/application/use-cases/get-appointment-calendar.use-case";
-import { Appointment } from "../../src/domain/entities/appointment.entity";
 import type { AppointmentRepository } from "../../src/domain/repositories/appointment.repository";
 
 const calendar: BusinessCalendar = {
@@ -23,19 +22,16 @@ const calendar: BusinessCalendar = {
   },
 };
 
-const occupiedAppointment = Appointment.create({
-  id: "occupied",
-  customerId: "customer",
-  petId: "pet",
-  service: "bath-and-ear-cleaning",
+const occupiedPeriod = {
   startsAt: new Date("2026-06-20T09:00:00.000Z"),
-  durationMinutes: 60,
-});
+  endsAt: new Date("2026-06-20T10:00:00.000Z"),
+};
 
 describe("GetAppointmentCalendarUseCase", () => {
   it("returns monthly availability and anonymized busy periods", async () => {
     const appointments: AppointmentRepository = {
-      findOverlapping: vi.fn(async () => [occupiedAppointment]),
+      findBusyPeriods: vi.fn(async () => [occupiedPeriod]),
+      hasActiveOverlap: vi.fn(async () => false),
       save: vi.fn(async () => undefined),
     };
     const clock: Clock = {
@@ -53,6 +49,7 @@ describe("GetAppointmentCalendarUseCase", () => {
       petWeightKg: 5,
     });
     const occupiedDay = result.days.find((day) => day.date === "2026-06-20");
+    const currentDay = result.days.find((day) => day.date === "2026-06-13");
     const pastDay = result.days.find((day) => day.date === "2026-06-12");
 
     expect(result.timeZone).toBe("America/Santiago");
@@ -77,5 +74,11 @@ describe("GetAppointmentCalendarUseCase", () => {
     ).toBe("available");
     expect(pastDay?.isPast).toBe(true);
     expect(pastDay?.availableCount).toBe(0);
+    expect(pastDay?.slots).toEqual([]);
+    expect(
+      currentDay?.slots.every(
+        (slot) => new Date(slot.startsAt).getTime() > clock.now().getTime(),
+      ),
+    ).toBe(true);
   });
 });

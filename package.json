@@ -22,6 +22,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "turbo run lint",
+    "performance:check": "pnpm --filter @caninany/frontend build && pnpm --filter @caninany/frontend performance:check",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "db:generate": "pnpm --filter @caninany/backend prisma:generate",

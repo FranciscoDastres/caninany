@@ -13,6 +13,13 @@ export class PrismaPurchaseRepository implements PurchaseRepository {
       await this.prisma.purchase.findMany({
         where: { customerId },
         orderBy: { purchasedAt: "desc" },
+        select: {
+          id: true,
+          description: true,
+          total: true,
+          purchasedAt: true,
+          receiptUrl: true,
+        },
       })
     ).map((purchase) => ({
       id: purchase.id,

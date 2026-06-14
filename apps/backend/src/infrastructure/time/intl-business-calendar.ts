@@ -11,11 +11,29 @@ export class IntlBusinessCalendar implements BusinessCalendar {
   private readonly timeZone: string;
   private readonly openingHour: number;
   private readonly closingHour: number;
+  private readonly dateFormatter: Intl.DateTimeFormat;
+  private readonly offsetFormatter: Intl.DateTimeFormat;
 
   constructor(config: ConfigService) {
     this.timeZone = config.getOrThrow<string>("BUSINESS_TIMEZONE");
     this.openingHour = config.getOrThrow<number>("BUSINESS_OPENING_HOUR");
     this.closingHour = config.getOrThrow<number>("BUSINESS_CLOSING_HOUR");
+    this.dateFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: this.timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    this.offsetFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: this.timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    });
   }
 
   getBusinessDay(date: string): BusinessDay {
@@ -38,12 +56,7 @@ export class IntlBusinessCalendar implements BusinessCalendar {
   }
 
   getDateForInstant(instant: Date): string {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: this.timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).formatToParts(instant);
+    const parts = this.dateFormatter.formatToParts(instant);
     const values = Object.fromEntries(
       parts
         .filter((part) => part.type !== "literal")
@@ -73,16 +86,7 @@ export class IntlBusinessCalendar implements BusinessCalendar {
   }
 
   private getOffsetMilliseconds(instant: Date): number {
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: this.timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23",
-    }).formatToParts(instant);
+    const parts = this.offsetFormatter.formatToParts(instant);
     const values = Object.fromEntries(
       parts
         .filter((part) => part.type !== "literal")

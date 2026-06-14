@@ -99,6 +99,11 @@ a {
   background-size: 32px 32px;
 }
 
+.deferred-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
 .image-reveal {
   overflow: hidden;
 }

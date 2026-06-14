@@ -18,10 +18,12 @@ export interface CreateUserRecord {
   role: UserRole;
 }
 
+export type UserSummaryRecord = Omit<UserRecord, "passwordHash">;
+
 export interface UserRepository {
   create(input: CreateUserRecord): Promise<UserRecord>;
   findByEmail(email: string): Promise<UserRecord | null>;
   findById(id: string): Promise<UserRecord | null>;
-  list(): Promise<UserRecord[]>;
-  updateRole(id: string, role: UserRole): Promise<UserRecord>;
+  list(): Promise<UserSummaryRecord[]>;
+  updateRole(id: string, role: UserRole): Promise<UserSummaryRecord>;
 }

@@ -2,20 +2,16 @@ import { Injectable } from "@nestjs/common";
 
 import { Appointment } from "../../../../domain/entities/appointment.entity";
 import { AppointmentConflictError } from "../../../../domain/errors/domain.error";
-import type { AppointmentRepository } from "../../../../domain/repositories/appointment.repository";
-import type { Appointment as PrismaAppointment } from "../../../../generated/prisma/client";
+import type {
+  AppointmentBusyPeriod,
+  AppointmentRepository,
+} from "../../../../domain/repositories/appointment.repository";
 import { PrismaService } from "../prisma.service";
 
 const serviceToPersistence = {
   bath: "BATH",
   "ear-cleaning": "EAR_CLEANING",
   "bath-and-ear-cleaning": "BATH_AND_EAR_CLEANING",
-} as const;
-
-const serviceToDomain = {
-  BATH: "bath",
-  EAR_CLEANING: "ear-cleaning",
-  BATH_AND_EAR_CLEANING: "bath-and-ear-cleaning",
 } as const;
 
 const statusToPersistence = {
@@ -25,27 +21,39 @@ const statusToPersistence = {
   cancelled: "CANCELLED",
 } as const;
 
-const statusToDomain = {
-  PENDING: "pending",
-  CONFIRMED: "confirmed",
-  COMPLETED: "completed",
-  CANCELLED: "cancelled",
-} as const;
-
 @Injectable()
 export class PrismaAppointmentRepository implements AppointmentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOverlapping(startsAt: Date, endsAt: Date): Promise<Appointment[]> {
-    const records = await this.prisma.appointment.findMany({
+  async findBusyPeriods(
+    startsAt: Date,
+    endsAt: Date,
+  ): Promise<AppointmentBusyPeriod[]> {
+    return this.prisma.appointment.findMany({
       where: {
         status: { in: ["PENDING", "CONFIRMED"] },
         startsAt: { lt: endsAt },
         endsAt: { gt: startsAt },
       },
+      orderBy: { startsAt: "asc" },
+      select: {
+        startsAt: true,
+        endsAt: true,
+      },
+    });
+  }
+
+  async hasActiveOverlap(startsAt: Date, endsAt: Date): Promise<boolean> {
+    const appointment = await this.prisma.appointment.findFirst({
+      where: {
+        status: { in: ["PENDING", "CONFIRMED"] },
+        startsAt: { lt: endsAt },
+        endsAt: { gt: startsAt },
+      },
+      select: { id: true },
     });
 
-    return records.map((record) => this.toDomain(record));
+    return appointment !== null;
   }
 
   async save(appointment: Appointment): Promise<void> {
@@ -91,37 +99,5 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       }
       throw error;
     }
-  }
-
-  private toDomain(record: PrismaAppointment): Appointment {
-    const hasPublicRequester = Boolean(
-      record.ownerName &&
-      record.phone &&
-      record.petName &&
-      record.petWeightKg !== null,
-    );
-
-    return Appointment.restore({
-      id: record.id,
-      ...(record.customerId ? { customerId: record.customerId } : {}),
-      ...(record.petId ? { petId: record.petId } : {}),
-      ...(hasPublicRequester
-        ? {
-            publicRequester: {
-              ownerName: record.ownerName!,
-              phone: record.phone!,
-              ...(record.email ? { email: record.email } : {}),
-              petName: record.petName!,
-              petWeightKg: Number(record.petWeightKg),
-            },
-          }
-        : {}),
-      service: serviceToDomain[record.service],
-      startsAt: record.startsAt,
-      durationMinutes: record.durationMinutes,
-      status: statusToDomain[record.status],
-      ...(record.notes ? { notes: record.notes } : {}),
-      createdAt: record.createdAt,
-    });
   }
 }

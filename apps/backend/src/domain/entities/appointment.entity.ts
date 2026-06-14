@@ -55,10 +55,6 @@ export class Appointment {
     });
   }
 
-  static restore(props: AppointmentProps): Appointment {
-    return new Appointment(props);
-  }
-
   get id(): string {
     return this.props.id;
   }

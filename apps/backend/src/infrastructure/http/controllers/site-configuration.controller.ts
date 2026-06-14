@@ -50,7 +50,13 @@ export class SiteConfigurationController {
 
   @Get()
   @ApiOkResponse({ description: "Contenido público editable del sitio." })
-  get(): Promise<SiteConfigurationDto> {
+  get(
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<SiteConfigurationDto> {
+    response.setHeader(
+      "Cache-Control",
+      "public, max-age=60, stale-while-revalidate=300",
+    );
     return this.configuration.get();
   }
 

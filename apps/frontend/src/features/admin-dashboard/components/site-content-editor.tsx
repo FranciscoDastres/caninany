@@ -51,10 +51,8 @@ export function SiteContentEditor(): JSX.Element {
   const onSubmit = handleSubmit(async (values) => {
     setMessage(null);
     try {
-      await updateSiteConfiguration(values);
-      await queryClient.invalidateQueries({
-        queryKey: ["configuracion-sitio"],
-      });
+      const updatedConfiguration = await updateSiteConfiguration(values);
+      queryClient.setQueryData(["configuracion-sitio"], updatedConfiguration);
       setMessage("Contenido actualizado correctamente.");
     } catch (error) {
       setMessage(

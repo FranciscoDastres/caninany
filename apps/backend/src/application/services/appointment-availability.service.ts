@@ -1,35 +1,44 @@
 import type { AppointmentCalendarDayDto } from "@caninany/shared";
 
 import type { BusinessDay } from "../ports/business-calendar.port";
-import type { Appointment } from "../../domain/entities/appointment.entity";
-import { ScheduleConflictService } from "../../domain/services/schedule-conflict.service";
+import type { AppointmentBusyPeriod } from "../../domain/repositories/appointment.repository";
 
 export const APPOINTMENT_INTERVAL_MINUTES = 30;
 
 interface BuildDayAvailabilityInput {
   businessDay: BusinessDay;
+  busyPeriods: AppointmentBusyPeriod[];
   date: string;
   durationMinutes: number;
-  existing: Appointment[];
   now: Date;
 }
 
 export function buildDayAvailability({
   businessDay,
+  busyPeriods,
   date,
   durationMinutes,
-  existing,
   now,
 }: BuildDayAvailabilityInput): AppointmentCalendarDayDto {
-  const relevantAppointments = existing
-    .filter(
-      (appointment) =>
-        appointment.startsAt.getTime() < businessDay.dayEnd.getTime() + 1 &&
-        appointment.endsAt.getTime() > businessDay.dayStart.getTime(),
-    )
-    .sort((left, right) => left.startsAt.getTime() - right.startsAt.getTime());
+  const isPast = businessDay.closing.getTime() <= now.getTime();
+  if (isPast) {
+    return {
+      date,
+      isPast: true,
+      availableCount: 0,
+      busyCount: 0,
+      slots: [],
+      busyPeriods: [],
+    };
+  }
 
+  const relevantBusyPeriods = busyPeriods.filter(
+    (period) => period.endsAt.getTime() > now.getTime(),
+  );
   const slots: AppointmentCalendarDayDto["slots"] = [];
+  let availableCount = 0;
+  let busyPeriodIndex = 0;
+
   for (
     let cursor = businessDay.opening;
     cursor.getTime() + durationMinutes * 60_000 <=
@@ -37,16 +46,19 @@ export function buildDayAvailability({
     cursor = new Date(cursor.getTime() + APPOINTMENT_INTERVAL_MINUTES * 60_000)
   ) {
     const endsAt = new Date(cursor.getTime() + durationMinutes * 60_000);
+    if (cursor.getTime() <= now.getTime()) continue;
+
+    let busyPeriod = relevantBusyPeriods[busyPeriodIndex];
+    while (busyPeriod && busyPeriod.endsAt.getTime() <= cursor.getTime()) {
+      busyPeriodIndex += 1;
+      busyPeriod = relevantBusyPeriods[busyPeriodIndex];
+    }
+
     const status =
-      cursor.getTime() <= now.getTime()
-        ? "past"
-        : ScheduleConflictService.hasConflict(
-              cursor,
-              durationMinutes,
-              relevantAppointments,
-            )
-          ? "occupied"
-          : "available";
+      busyPeriod && busyPeriod.startsAt.getTime() < endsAt.getTime()
+        ? "occupied"
+        : "available";
+    if (status === "available") availableCount += 1;
 
     slots.push({
       startsAt: cursor.toISOString(),
@@ -57,13 +69,13 @@ export function buildDayAvailability({
 
   return {
     date,
-    isPast: businessDay.closing.getTime() <= now.getTime(),
-    availableCount: slots.filter((slot) => slot.status === "available").length,
-    busyCount: relevantAppointments.length,
+    isPast: false,
+    availableCount,
+    busyCount: relevantBusyPeriods.length,
     slots,
-    busyPeriods: relevantAppointments.map((appointment) => ({
-      startsAt: appointment.startsAt.toISOString(),
-      endsAt: appointment.endsAt.toISOString(),
+    busyPeriods: relevantBusyPeriods.map((period) => ({
+      startsAt: period.startsAt.toISOString(),
+      endsAt: period.endsAt.toISOString(),
     })),
   };
 }

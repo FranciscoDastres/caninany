@@ -24,7 +24,7 @@ export class GetAvailableSlotsUseCase {
     const { dayStart, dayEnd, opening, closing } = this.calendar.getBusinessDay(
       query.date,
     );
-    const existing = await this.appointments.findOverlapping(
+    const busyPeriods = await this.appointments.findBusyPeriods(
       dayStart,
       new Date(dayEnd.getTime() + 1),
     );
@@ -35,8 +35,8 @@ export class GetAvailableSlotsUseCase {
     const availability = buildDayAvailability({
       date: query.date,
       businessDay: { dayStart, dayEnd, opening, closing },
+      busyPeriods,
       durationMinutes,
-      existing,
       now: this.clock.now(),
     });
 

@@ -16,7 +16,7 @@ import {
 import type { JSX } from "react";
 import { Link } from "react-router-dom";
 
-import { AppointmentForm } from "@/features/appointments/components/appointment-form";
+import { DeferredAppointmentForm } from "@/features/appointments/components/deferred-appointment-form";
 import { useSiteConfiguration } from "@/features/site-configuration/hooks/use-site-configuration";
 
 import { GallerySection } from "../components/gallery-section";
@@ -115,6 +115,7 @@ export function HomePage(): JSX.Element {
             src={content.heroImageUrl}
             alt="Golden retriever feliz después de su baño"
             className="absolute inset-0 size-full object-cover object-[65%_center]"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#f8f1e7] via-[#f8f1e7]/93 to-[#f8f1e7]/5 sm:via-[#f8f1e7]/80" />
           <div className="absolute -left-16 bottom-[-7rem] size-72 rounded-full border-[42px] border-[#d79570]/20" />
@@ -180,7 +181,7 @@ export function HomePage(): JSX.Element {
         </div>
       </section>
 
-      <section className="px-5 py-12 sm:px-8 lg:py-20">
+      <section className="deferred-section px-5 py-12 sm:px-8 lg:py-20">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 border-y border-[#e4dbcf] py-9 text-center md:grid-cols-4">
           {[
             ["+500", "colas felices"],
@@ -200,7 +201,10 @@ export function HomePage(): JSX.Element {
         </div>
       </section>
 
-      <section id="servicios" className="px-5 py-20 sm:px-8 lg:py-28">
+      <section
+        id="servicios"
+        className="deferred-section px-5 py-20 sm:px-8 lg:py-28"
+      >
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <p className="eyebrow">{content.servicesEyebrow}</p>
@@ -256,7 +260,7 @@ export function HomePage(): JSX.Element {
 
       <section
         id="experiencia"
-        className="bg-[#eef2e8] px-5 py-24 sm:px-8 lg:py-32"
+        className="deferred-section bg-[#eef2e8] px-5 py-24 sm:px-8 lg:py-32"
       >
         <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="relative">
@@ -328,7 +332,7 @@ export function HomePage(): JSX.Element {
         </div>
       </section>
 
-      <section className="soft-grid px-5 py-24 sm:px-8 lg:py-32">
+      <section className="deferred-section soft-grid px-5 py-24 sm:px-8 lg:py-32">
         <div className="mx-auto max-w-7xl">
           <div className="text-center">
             <p className="eyebrow">Así de simple</p>
@@ -364,7 +368,10 @@ export function HomePage(): JSX.Element {
 
       <GallerySection />
 
-      <section id="opiniones" className="px-5 py-24 sm:px-8 lg:py-32">
+      <section
+        id="opiniones"
+        className="deferred-section px-5 py-24 sm:px-8 lg:py-32"
+      >
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr]">
             <div>
@@ -422,7 +429,7 @@ export function HomePage(): JSX.Element {
 
       <section
         id="reservar"
-        className="bg-[#d9865f] px-5 py-24 sm:px-8 lg:py-32"
+        className="deferred-section bg-[#d9865f] px-5 py-24 sm:px-8 lg:py-32"
       >
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
           <div className="text-white lg:sticky lg:top-32">
@@ -459,7 +466,7 @@ export function HomePage(): JSX.Element {
           </div>
 
           <div className="rounded-[2.5rem] bg-[#fffaf3] p-6 shadow-[0_30px_90px_rgba(94,45,24,0.22)] sm:p-10">
-            <AppointmentForm />
+            <DeferredAppointmentForm />
           </div>
         </div>
       </section>
