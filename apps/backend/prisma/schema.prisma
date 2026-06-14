@@ -28,15 +28,17 @@ enum AppointmentStatus {
 }
 
 model User {
-  id           String        @id @default(uuid()) @db.Uuid
-  email        String        @unique
-  passwordHash String
-  name         String
-  role         UserRole      @default(CLIENT)
-  pets         Pet[]
-  appointments Appointment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                       String              @id @default(uuid()) @db.Uuid
+  email                    String              @unique
+  passwordHash             String
+  name                     String
+  role                     UserRole            @default(CLIENT)
+  pets                     Pet[]
+  appointments             Appointment[]
+  purchases                Purchase[]
+  siteConfigurationUpdates SiteConfiguration[] @relation("SiteConfigurationUpdatedBy")
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 }
 
 model Pet {
@@ -71,4 +73,33 @@ model Appointment {
   @@index([customerId, startsAt])
   @@index([petId, startsAt])
   @@index([startsAt, endsAt])
+}
+
+model Purchase {
+  id          String   @id @default(uuid()) @db.Uuid
+  customerId  String   @db.Uuid
+  customer    User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  description String
+  total       Decimal  @db.Decimal(12, 2)
+  purchasedAt DateTime @default(now()) @db.Timestamptz(3)
+  receiptUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([customerId, purchasedAt])
+}
+
+model SiteConfiguration {
+  id                  String   @id @default("principal")
+  heroTitle           String
+  heroHighlight       String
+  heroDescription     String
+  heroImageUrl        String
+  servicesEyebrow     String
+  servicesTitle       String
+  servicesDescription String
+  updatedById         String?  @db.Uuid
+  updatedBy           User?    @relation("SiteConfigurationUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
