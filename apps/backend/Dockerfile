@@ -37,9 +37,11 @@ RUN pnpm --filter @caninany/shared build \
 FROM node:22-bookworm-slim AS production
 
 ENV NODE_ENV=production
+ENV UPLOADS_DIR=/app/uploads
 WORKDIR /app
 
 COPY --from=builder /prod/backend ./
+RUN mkdir -p /app/uploads && chown -R node:node /app/uploads
 
 USER node
 EXPOSE 3000

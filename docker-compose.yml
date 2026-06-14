@@ -43,6 +43,11 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-caninany}:${POSTGRES_PASSWORD:-caninany-local-password}@db:5432/${POSTGRES_DB:-caninany}?schema=public
       JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-before-production}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:3000/api/v1}
+      UPLOADS_DIR: /workspace/uploads
+      ADMIN_NAME: ${ADMIN_NAME:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       BUSINESS_TIMEZONE: ${BUSINESS_TIMEZONE:-America/Santiago}
       BUSINESS_OPENING_HOUR: ${BUSINESS_OPENING_HOUR:-9}
       BUSINESS_CLOSING_HOUR: ${BUSINESS_CLOSING_HOUR:-18}
@@ -53,6 +58,7 @@ services:
       - backend_root_node_modules:/workspace/node_modules
       - backend_app_node_modules:/workspace/apps/backend/node_modules
       - backend_shared_node_modules:/workspace/packages/shared/node_modules
+      - uploads_data:/workspace/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -102,6 +108,7 @@ volumes:
   frontend_root_node_modules:
   frontend_app_node_modules:
   frontend_shared_node_modules:
+  uploads_data:
 
 networks:
   caninany:
