@@ -1,6 +1,6 @@
 # Roadmap de producto
 
-Estado de referencia: 12 de junio de 2026.
+Estado de referencia: 13 de junio de 2026.
 
 ## Fase 0: Fundación técnica
 
@@ -25,15 +25,15 @@ Resultado: completada.
 Objetivo: que una persona pueda registrarse, iniciar sesión y administrar sus
 mascotas sin introducir UUIDs manualmente.
 
-- [ ] Implementar registro de clientes.
+- [x] Implementar registro de clientes.
 - [ ] Implementar login con access token y refresh token rotatorio.
 - [ ] Hashear contraseñas con Argon2.
 - [ ] Implementar logout y revocación de sesiones.
-- [ ] Crear endpoint `GET /auth/me`.
+- [x] Crear endpoint `GET /auth/me`.
 - [ ] Implementar CRUD de mascotas.
 - [ ] Validar que cada cliente solo acceda a sus propias mascotas.
-- [ ] Añadir usuario administrador inicial mediante seed seguro.
-- [ ] Crear pantallas de registro, login y perfil.
+- [x] Añadir usuario administrador inicial mediante configuración segura.
+- [x] Crear pantallas de registro, login y perfil.
 - [ ] Sustituir UUIDs del formulario por la sesión y un selector de mascotas.
 - [ ] Añadir pruebas unitarias, integración y e2e del flujo.
 

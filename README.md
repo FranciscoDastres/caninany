@@ -146,6 +146,13 @@ caninany/
   el repositorio para hot reload.
 - El formulario y el controlador consumen el mismo esquema Zod, evitando
   divergencia entre validación de cliente y servidor.
+- Los JWT incluyen `userId`, correo, nombre y rol (`cliente` o `admin`). El
+  frontend usa `PrivateRoute` para navegación, pero la autorización efectiva
+  siempre se ejecuta en NestJS mediante `JwtAuthGuard` y `RolesGuard`.
+- Las contraseñas se almacenan con `scrypt` y salt aleatorio. Nunca se
+  persisten ni se registran en texto plano.
+- Las imágenes editables se guardan en un volumen persistente y PostgreSQL
+  conserva únicamente su URL.
 
 ## Desarrollo local
 
@@ -184,6 +191,39 @@ npm run dev:down
 
 No necesitas ejecutar comandos separados dentro de `apps/frontend` y
 `apps/backend`. Los scripts se ejecutan siempre desde la raíz del monorepo.
+
+### Administrador inicial
+
+Configura estas variables en `.env` antes del primer arranque:
+
+```dotenv
+ADMIN_NAME=Administración Caninany
+ADMIN_EMAIL=admin@caninany.cl
+ADMIN_PASSWORD=una-clave-segura-de-al-menos-12-caracteres
+```
+
+El backend crea la cuenta solo cuando el correo todavía no existe. El registro
+público siempre crea usuarios con rol `cliente`.
+
+### Rutas de autenticación y RBAC
+
+- `POST /api/v1/auth/register`: registro de clientes.
+- `POST /api/v1/auth/login`: entrega JWT y usuario autenticado.
+- `GET /api/v1/auth/me`: perfil asociado al token.
+- `GET /api/v1/compras/mis-compras`: compras del cliente autenticado.
+- `GET /api/v1/usuarios`: listado exclusivo para administradores.
+- `PATCH /api/v1/usuarios/:id/rol`: cambio de rol exclusivo para
+  administradores.
+- `GET /api/v1/configuracion-sitio`: contenido público de la portada.
+- `PUT /api/v1/configuracion-sitio`: edición exclusiva para administradores.
+- `POST /api/v1/configuracion-sitio/imagenes`: carga de JPG, PNG o WebP
+  exclusiva para administradores.
+
+Rutas React:
+
+- `/ingresar` y `/registro`.
+- `/perfil`: panel protegido para clientes.
+- `/admin`: gestión de usuarios y contenido, protegida para administradores.
 
 ### Opción sin Docker para Node
 
