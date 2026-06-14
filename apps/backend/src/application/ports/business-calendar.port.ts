@@ -9,4 +9,6 @@ export interface BusinessDay {
 
 export interface BusinessCalendar {
   getBusinessDay(date: string): BusinessDay;
+  getDateForInstant(instant: Date): string;
+  getTimeZone(): string;
 }

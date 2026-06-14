@@ -12,6 +12,7 @@ import {
 import {
   AppointmentConflictError,
   AppointmentInPastError,
+  AppointmentOutsideBusinessHoursError,
   CannotChangeOwnRoleError,
   EmailAlreadyRegisteredError,
   InvalidCredentialsError,
@@ -22,6 +23,7 @@ import {
 @Catch(
   AppointmentConflictError,
   AppointmentInPastError,
+  AppointmentOutsideBusinessHoursError,
   InvalidPetWeightError,
   EmailAlreadyRegisteredError,
   InvalidCredentialsError,
@@ -33,6 +35,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
     exception:
       | AppointmentConflictError
       | AppointmentInPastError
+      | AppointmentOutsideBusinessHoursError
       | InvalidPetWeightError
       | EmailAlreadyRegisteredError
       | InvalidCredentialsError

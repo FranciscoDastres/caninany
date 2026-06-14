@@ -7,7 +7,7 @@ import { AppointmentForm } from "../components/appointment-form";
 export function AppointmentsPage(): JSX.Element {
   return (
     <section className="min-h-screen bg-[#eef2e8] px-5 pb-20 pt-32 sm:px-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-5xl">
         <Link
           to="/"
           className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#355f4c]"
@@ -20,9 +20,9 @@ export function AppointmentsPage(): JSX.Element {
           <h1 className="mt-4 font-display text-4xl leading-tight text-[#183c2d] sm:text-5xl">
             Cuéntanos sobre tu mejor amigo.
           </h1>
-          <p className="mt-4 max-w-xl leading-7 text-[#66766e]">
-            Completa la solicitud y te contactaremos para confirmar la hora más
-            cómoda para ambos.
+          <p className="mt-4 max-w-2xl leading-7 text-[#66766e]">
+            Revisa la agenda real, elige un bloque disponible y registra tu
+            solicitud. Los horarios pedidos se bloquean automáticamente.
           </p>
           <div className="mt-8">
             <AppointmentForm />

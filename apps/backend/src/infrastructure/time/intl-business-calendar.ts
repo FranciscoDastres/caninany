@@ -33,6 +33,26 @@ export class IntlBusinessCalendar implements BusinessCalendar {
     };
   }
 
+  getTimeZone(): string {
+    return this.timeZone;
+  }
+
+  getDateForInstant(instant: Date): string {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: this.timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(instant);
+    const values = Object.fromEntries(
+      parts
+        .filter((part) => part.type !== "literal")
+        .map((part) => [part.type, part.value]),
+    );
+
+    return `${values.year}-${values.month}-${values.day}`;
+  }
+
   private toUtc(date: string, hour: number): Date {
     const [year, month, day] = date.split("-").map(Number);
     if (!year || !month || !day) {

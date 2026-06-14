@@ -6,10 +6,19 @@ export type AppointmentStatus =
   | "completed"
   | "cancelled";
 
+export interface PublicAppointmentRequester {
+  ownerName: string;
+  phone: string;
+  email?: string;
+  petName: string;
+  petWeightKg: number;
+}
+
 export interface AppointmentProps {
   id: string;
-  customerId: string;
-  petId: string;
+  customerId?: string;
+  petId?: string;
+  publicRequester?: PublicAppointmentRequester;
   service: AppointmentService;
   startsAt: Date;
   durationMinutes: number;
@@ -25,6 +34,20 @@ export class Appointment {
     props: Omit<AppointmentProps, "status" | "createdAt"> &
       Partial<Pick<AppointmentProps, "status" | "createdAt">>,
   ): Appointment {
+    const hasAnyRegisteredRequester = Boolean(props.customerId || props.petId);
+    const hasRegisteredRequester = Boolean(props.customerId && props.petId);
+    const hasPublicRequester = Boolean(props.publicRequester);
+    const hasValidRegisteredRequester =
+      hasRegisteredRequester && !hasPublicRequester;
+    const hasValidPublicRequester =
+      !hasAnyRegisteredRequester && hasPublicRequester;
+
+    if (!hasValidRegisteredRequester && !hasValidPublicRequester) {
+      throw new Error(
+        "An appointment requires exactly one complete requester type.",
+      );
+    }
+
     return new Appointment({
       ...props,
       status: props.status ?? "pending",
@@ -40,12 +63,18 @@ export class Appointment {
     return this.props.id;
   }
 
-  get customerId(): string {
+  get customerId(): string | undefined {
     return this.props.customerId;
   }
 
-  get petId(): string {
+  get petId(): string | undefined {
     return this.props.petId;
+  }
+
+  get publicRequester(): PublicAppointmentRequester | undefined {
+    return this.props.publicRequester
+      ? { ...this.props.publicRequester }
+      : undefined;
   }
 
   get service(): AppointmentService {

@@ -1,37 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  APPOINTMENT_SERVICES,
   PET_WEIGHT_LIMITS,
+  createPublicAppointmentRequestSchema,
   type AppointmentService,
+  type CreatePublicAppointmentRequestInput,
+  type PublicAppointmentRequestDto,
 } from "@caninany/shared";
 import { Bath, CheckCircle2, Ear, Send, Sparkles } from "lucide-react";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useEffect, useRef, useState } from "react";
+import { useForm, type UseFormRegister } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
+import { getApiErrorMessage } from "@/core/api/get-api-error";
 
-const bookingRequestSchema = z.object({
-  ownerName: z.string().trim().min(2, "Escribe tu nombre."),
-  phone: z.string().trim().min(8, "Ingresa un teléfono válido."),
-  email: z
-    .union([z.email("Ingresa un correo válido."), z.literal("")])
-    .optional(),
-  petName: z.string().trim().min(2, "Escribe el nombre de tu mascota."),
-  petWeightKg: z
-    .number({ error: "Indica su peso aproximado." })
-    .min(PET_WEIGHT_LIMITS.minKg, "El peso debe ser mayor a 1 kg.")
-    .max(PET_WEIGHT_LIMITS.maxKg, "Revisa el peso ingresado."),
-  service: z.enum(APPOINTMENT_SERVICES, {
-    error: "Selecciona un servicio.",
-  }),
-  preferredDate: z.string().min(1, "Selecciona una fecha."),
-  preferredTime: z.string().min(1, "Selecciona un horario."),
-  notes: z.string().trim().max(500, "Máximo 500 caracteres.").optional(),
-});
-
-type BookingRequest = z.infer<typeof bookingRequestSchema>;
+import { useCreatePublicAppointmentRequest } from "../hooks/use-create-public-appointment-request";
+import { AppointmentCalendar } from "./appointment-calendar";
 
 const serviceOptions: Array<{
   description: string;
@@ -59,105 +43,92 @@ const serviceOptions: Array<{
   },
 ];
 
-const availableTimes = [
-  "09:00",
-  "10:00",
-  "11:00",
-  "12:00",
-  "14:00",
-  "15:00",
-  "16:00",
-  "17:00",
-];
-
 export function AppointmentForm(): JSX.Element {
-  const [requestReady, setRequestReady] = useState(false);
-  const minDate = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const mutation = useCreatePublicAppointmentRequest();
+  const [createdRequest, setCreatedRequest] =
+    useState<PublicAppointmentRequestDto | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
-    formState: { errors, isSubmitting },
+    clearErrors,
+    formState: { errors },
     handleSubmit,
     register,
     reset,
+    setValue,
     watch,
-  } = useForm<BookingRequest>({
-    resolver: zodResolver(bookingRequestSchema),
+  } = useForm<CreatePublicAppointmentRequestInput>({
+    resolver: zodResolver(createPublicAppointmentRequestSchema),
     defaultValues: {
       email: "",
       service: "bath-and-ear-cleaning",
-      preferredTime: "",
+      startsAt: "",
       notes: "",
     },
   });
   const selectedService = watch("service");
+  const petWeightKg = watch("petWeightKg");
+  const selectedStartsAt = watch("startsAt");
+  const availabilityKey = `${selectedService}:${petWeightKg}`;
+  const previousAvailabilityKey = useRef(availabilityKey);
+
+  useEffect(() => {
+    if (previousAvailabilityKey.current === availabilityKey) return;
+
+    previousAvailabilityKey.current = availabilityKey;
+    setValue("startsAt", "", { shouldValidate: false });
+    setServerError(null);
+  }, [availabilityKey, setValue]);
 
   const onSubmit = handleSubmit(async (values) => {
-    const service =
-      serviceOptions.find((option) => option.value === values.service)?.label ??
-      values.service;
-    const message = [
-      "Hola Caninany, quiero solicitar una hora.",
-      `Humano: ${values.ownerName}`,
-      `Teléfono: ${values.phone}`,
-      `Mascota: ${values.petName}`,
-      `Peso aproximado: ${values.petWeightKg} kg`,
-      `Servicio: ${service}`,
-      `Preferencia: ${values.preferredDate} a las ${values.preferredTime}`,
-      values.email ? `Correo: ${values.email}` : "",
-      values.notes ? `Notas: ${values.notes}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
+    setServerError(null);
 
-    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER?.replace(
-      /\D/g,
-      "",
-    );
-
-    if (whatsappNumber) {
-      window.open(
-        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-    } else if (navigator.share) {
-      await navigator.share({
-        title: "Solicitud de hora Caninany",
-        text: message,
+    try {
+      const request = await mutation.mutateAsync(values);
+      setCreatedRequest(request);
+      await shareRequestSummary(values, request);
+      reset({
+        email: "",
+        service: "bath-and-ear-cleaning",
+        startsAt: "",
+        notes: "",
       });
-    } else {
-      await navigator.clipboard.writeText(message);
+    } catch (error) {
+      setServerError(
+        getApiErrorMessage(
+          error,
+          "No fue posible registrar la solicitud. Intenta nuevamente.",
+        ),
+      );
     }
-
-    setRequestReady(true);
-    reset({
-      email: "",
-      service: "bath-and-ear-cleaning",
-      preferredTime: "",
-      notes: "",
-    });
   });
 
-  if (requestReady) {
+  if (createdRequest) {
     return (
       <div className="grid min-h-[480px] place-items-center text-center">
         <div className="max-w-md">
           <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#dce8db] text-[#2c654b]">
             <CheckCircle2 className="size-9" />
           </span>
-          <p className="eyebrow mt-7">Solicitud preparada</p>
+          <p className="eyebrow mt-7">Solicitud registrada</p>
           <h3 className="mt-3 font-display text-4xl leading-tight text-[#183c2d]">
-            Ya casi tienen su momento Caninany.
+            El bloque quedó reservado para revisión.
           </h3>
           <p className="mt-4 leading-7 text-[#6d7b73]">
-            Comparte el resumen por WhatsApp. La hora queda confirmada cuando
-            nuestro equipo te responde.
+            Guardamos tu solicitud para el{" "}
+            <strong>
+              {formatRequestDateTime(
+                createdRequest.startsAt,
+                createdRequest.endsAt,
+              )}
+            </strong>
+            . Te contactaremos para confirmar definitivamente.
           </p>
           <button
             type="button"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full border border-[#cfc5b8] px-6 text-sm font-extrabold text-[#214e3b] transition hover:bg-white"
-            onClick={() => setRequestReady(false)}
+            onClick={() => setCreatedRequest(null)}
           >
-            Preparar otra solicitud
+            Solicitar otra hora
           </button>
         </div>
       </div>
@@ -165,103 +136,86 @@ export function AppointmentForm(): JSX.Element {
   }
 
   return (
-    <form className="grid gap-7" onSubmit={onSubmit}>
-      <div>
-        <p className="eyebrow">Elige su cuidado</p>
-        <h3 className="mt-2 font-display text-3xl text-[#183c2d]">
-          ¿Qué necesita esta vez?
-        </h3>
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          {serviceOptions.map((option) => {
-            const selected = selectedService === option.value;
+    <form className="grid gap-8" onSubmit={onSubmit}>
+      <ServiceSelector
+        selectedService={selectedService}
+        register={register}
+        error={errors.service?.message}
+      />
 
-            return (
-              <label
-                key={option.value}
-                className={`relative cursor-pointer rounded-[1.4rem] border p-4 transition ${
-                  selected
-                    ? "border-[#214e3b] bg-[#e8efe8] shadow-sm"
-                    : "border-[#dfd7cc] bg-white hover:border-[#9eb1a5]"
-                }`}
-              >
-                <input
-                  type="radio"
-                  value={option.value}
-                  className="sr-only"
-                  {...register("service")}
-                />
-                <option.icon
-                  className={`size-6 ${selected ? "text-[#214e3b]" : "text-[#b16d4b]"}`}
-                  strokeWidth={1.8}
-                />
-                <span className="mt-3 block font-extrabold text-[#2b483a]">
-                  {option.label}
-                </span>
-                <span className="mt-1 block text-xs leading-5 text-[#75827b]">
-                  {option.description}
-                </span>
-                {selected ? (
-                  <CheckCircle2 className="absolute right-3 top-3 size-4 text-[#214e3b]" />
-                ) : null}
-              </label>
-            );
-          })}
+      <div>
+        <p className="eyebrow">Sobre tu mascota</p>
+        <div className="mt-4 grid gap-5 sm:grid-cols-2">
+          <Field label="Nombre de tu mascota" error={errors.petName?.message}>
+            <Input placeholder="Ej. Milo" {...register("petName")} />
+          </Field>
+          <Field
+            label="Peso aproximado (kg)"
+            error={errors.petWeightKg?.message}
+            hint="La duración se calcula usando este peso."
+          >
+            <Input
+              type="number"
+              min={PET_WEIGHT_LIMITS.minKg}
+              max={PET_WEIGHT_LIMITS.maxKg}
+              step="0.1"
+              placeholder="Ej. 12"
+              {...register("petWeightKg", { valueAsNumber: true })}
+            />
+          </Field>
         </div>
-        {errors.service ? (
-          <p className="mt-2 text-xs font-semibold text-red-700">
-            {errors.service.message}
-          </p>
-        ) : null}
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Tu nombre" error={errors.ownerName?.message}>
-          <Input
-            placeholder="¿Cómo te llamas?"
-            autoComplete="name"
-            {...register("ownerName")}
+      <div>
+        <p className="eyebrow">Agenda disponible</p>
+        <p className="mt-2 text-sm leading-6 text-[#75827b]">
+          Los bloques marcados como “Pedido” ya están ocupados. La información
+          personal de otras reservas permanece privada.
+        </p>
+        <div className="mt-4">
+          <input type="hidden" {...register("startsAt")} />
+          <AppointmentCalendar
+            service={selectedService}
+            petWeightKg={petWeightKg}
+            selectedStartsAt={selectedStartsAt}
+            error={errors.startsAt?.message}
+            onSelect={(startsAt) => {
+              setValue("startsAt", startsAt ?? "", {
+                shouldDirty: true,
+                shouldValidate: Boolean(startsAt),
+              });
+              if (startsAt) clearErrors("startsAt");
+              setServerError(null);
+            }}
           />
-        </Field>
-        <Field label="WhatsApp" error={errors.phone?.message}>
-          <Input
-            type="tel"
-            placeholder="+56 9 1234 5678"
-            autoComplete="tel"
-            {...register("phone")}
-          />
-        </Field>
-        <Field label="Nombre de tu mascota" error={errors.petName?.message}>
-          <Input placeholder="Ej. Milo" {...register("petName")} />
-        </Field>
-        <Field label="Peso aproximado (kg)" error={errors.petWeightKg?.message}>
-          <Input
-            type="number"
-            min={PET_WEIGHT_LIMITS.minKg}
-            max={PET_WEIGHT_LIMITS.maxKg}
-            step="0.1"
-            placeholder="Ej. 12"
-            {...register("petWeightKg", { valueAsNumber: true })}
-          />
-        </Field>
-        <Field label="Día preferido" error={errors.preferredDate?.message}>
-          <Input type="date" min={minDate} {...register("preferredDate")} />
-        </Field>
-        <Field label="Horario preferido" error={errors.preferredTime?.message}>
-          <select className="form-control" {...register("preferredTime")}>
-            <option value="">Selecciona una hora</option>
-            {availableTimes.map((time) => (
-              <option key={time} value={time}>
-                {time}
-              </option>
-            ))}
-          </select>
-        </Field>
+        </div>
+      </div>
+
+      <div>
+        <p className="eyebrow">Tus datos de contacto</p>
+        <div className="mt-4 grid gap-5 sm:grid-cols-2">
+          <Field label="Tu nombre" error={errors.ownerName?.message}>
+            <Input
+              placeholder="¿Cómo te llamas?"
+              autoComplete="name"
+              {...register("ownerName")}
+            />
+          </Field>
+          <Field label="WhatsApp" error={errors.phone?.message}>
+            <Input
+              type="tel"
+              placeholder="+56 9 1234 5678"
+              autoComplete="tel"
+              {...register("phone")}
+            />
+          </Field>
+        </div>
       </div>
 
       <Field
         label="Correo (opcional)"
         error={errors.email?.message}
-        hint="Lo usaremos solo para enviarte la confirmación."
+        hint="Lo usaremos solo para enviarte información sobre tu solicitud."
       >
         <Input
           type="email"
@@ -283,18 +237,87 @@ export function AppointmentForm(): JSX.Element {
         />
       </Field>
 
+      {serverError ? (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {serverError}
+        </p>
+      ) : null}
+
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={mutation.isPending}
         className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-[#214e3b] px-8 text-sm font-extrabold text-white shadow-[0_14px_35px_rgba(33,78,59,0.2)] transition hover:-translate-y-0.5 hover:bg-[#173c2c] disabled:pointer-events-none disabled:opacity-60"
       >
-        {isSubmitting ? "Preparando..." : "Solicitar una hora"}
+        {mutation.isPending
+          ? "Registrando solicitud..."
+          : "Solicitar esta hora"}
         <Send className="size-4 transition-transform group-hover:translate-x-1" />
       </button>
       <p className="text-center text-xs leading-5 text-[#7b8780]">
-        No se cobra nada ahora. Primero confirmamos disponibilidad contigo.
+        La solicitud bloquea el horario para evitar dobles reservas. La atención
+        queda confirmada cuando nuestro equipo te contacta.
       </p>
     </form>
+  );
+}
+
+interface ServiceSelectorProps {
+  error?: string | undefined;
+  register: UseFormRegister<CreatePublicAppointmentRequestInput>;
+  selectedService: AppointmentService;
+}
+
+function ServiceSelector({
+  error,
+  register,
+  selectedService,
+}: ServiceSelectorProps): JSX.Element {
+  return (
+    <div>
+      <p className="eyebrow">Elige su cuidado</p>
+      <h3 className="mt-2 font-display text-3xl text-[#183c2d]">
+        ¿Qué necesita esta vez?
+      </h3>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {serviceOptions.map((option) => {
+          const selected = selectedService === option.value;
+
+          return (
+            <label
+              key={option.value}
+              className={`relative cursor-pointer rounded-[1.4rem] border p-4 transition ${
+                selected
+                  ? "border-[#214e3b] bg-[#e8efe8] shadow-sm"
+                  : "border-[#dfd7cc] bg-white hover:border-[#9eb1a5]"
+              }`}
+            >
+              <input
+                type="radio"
+                value={option.value}
+                className="sr-only"
+                {...register("service")}
+              />
+              <option.icon
+                className={`size-6 ${selected ? "text-[#214e3b]" : "text-[#b16d4b]"}`}
+                strokeWidth={1.8}
+              />
+              <span className="mt-3 block font-extrabold text-[#2b483a]">
+                {option.label}
+              </span>
+              <span className="mt-1 block text-xs leading-5 text-[#75827b]">
+                {option.description}
+              </span>
+              {selected ? (
+                <CheckCircle2 className="absolute right-3 top-3 size-4 text-[#214e3b]" />
+              ) : null}
+            </label>
+          );
+        })}
+      </div>
+      {error ? (
+        <p className="mt-2 text-xs font-semibold text-red-700">{error}</p>
+      ) : null}
+    </div>
   );
 }
 
@@ -320,4 +343,69 @@ function Field({ children, error, hint, label }: FieldProps): JSX.Element {
       ) : null}
     </label>
   );
+}
+
+async function shareRequestSummary(
+  values: CreatePublicAppointmentRequestInput,
+  request: PublicAppointmentRequestDto,
+): Promise<void> {
+  const service =
+    serviceOptions.find((option) => option.value === values.service)?.label ??
+    values.service;
+  const message = [
+    "Hola Caninany, registré una solicitud de hora.",
+    `Código: ${request.id}`,
+    `Humano: ${values.ownerName}`,
+    `Teléfono: ${values.phone}`,
+    `Mascota: ${values.petName}`,
+    `Peso aproximado: ${values.petWeightKg} kg`,
+    `Servicio: ${service}`,
+    `Horario: ${formatRequestDateTime(request.startsAt, request.endsAt)}`,
+    values.email ? `Correo: ${values.email}` : "",
+    values.notes ? `Notas: ${values.notes}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER?.replace(
+    /\D/g,
+    "",
+  );
+
+  try {
+    if (whatsappNumber) {
+      window.open(
+        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+    } else if (navigator.share) {
+      await navigator.share({
+        title: "Solicitud de hora Caninany",
+        text: message,
+      });
+    } else {
+      await navigator.clipboard.writeText(message);
+    }
+  } catch {
+    // The request is already persisted; sharing is an optional convenience.
+  }
+}
+
+function formatRequestDateTime(startsAt: string, endsAt: string): string {
+  const dateFormatter = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  const timeFormatter = new Intl.DateTimeFormat("es-CL", {
+    timeZone: "America/Santiago",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return `${dateFormatter.format(new Date(startsAt))}, ${timeFormatter.format(
+    new Date(startsAt),
+  )}–${timeFormatter.format(new Date(endsAt))}`;
 }

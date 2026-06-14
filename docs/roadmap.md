@@ -44,17 +44,19 @@ crear una mascota y verla en su cuenta.
 
 Objetivo: permitir una reserva real, segura y comprensible.
 
-- [ ] Consultar disponibilidad desde el formulario.
-- [ ] Usar calendario y selector visual de bloques horarios.
+- [x] Consultar disponibilidad desde el formulario.
+- [x] Usar calendario y selector visual de bloques horarios.
+- [x] Crear solicitudes públicas persistidas sin exponer datos personales en
+      la disponibilidad.
 - [ ] Obtener peso y propiedad desde la mascota persistida.
-- [ ] Ignorar `customerId` enviado por el cliente y usar la identidad JWT.
+- [x] Ignorar `customerId` enviado por el cliente y usar la identidad JWT.
 - [ ] Verificar propiedad de la mascota dentro del caso de uso.
 - [ ] Crear página de confirmación y resumen de reserva.
 - [ ] Listar próximas citas e historial del cliente.
 - [ ] Permitir cancelar y reagendar según políticas configurables.
 - [ ] Definir anticipación mínima, máximo de días y días no laborables.
 - [ ] Añadir feriados, bloqueos manuales y pausas.
-- [ ] Traducir conflictos concurrentes de PostgreSQL a HTTP `409`.
+- [x] Traducir conflictos concurrentes de PostgreSQL a HTTP `409`.
 - [ ] Añadir pruebas e2e de reserva, conflicto, cancelación y reagendamiento.
 
 Criterio de terminado: un cliente autenticado selecciona su mascota, elige un

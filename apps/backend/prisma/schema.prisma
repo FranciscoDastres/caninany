@@ -57,10 +57,15 @@ model Pet {
 
 model Appointment {
   id              String             @id @default(uuid()) @db.Uuid
-  customerId      String             @db.Uuid
-  customer        User               @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  petId           String             @db.Uuid
-  pet             Pet                @relation(fields: [petId], references: [id], onDelete: Restrict)
+  customerId      String?            @db.Uuid
+  customer        User?              @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  petId           String?            @db.Uuid
+  pet             Pet?               @relation(fields: [petId], references: [id], onDelete: Restrict)
+  ownerName       String?
+  phone           String?
+  email           String?
+  petName         String?
+  petWeightKg     Decimal?           @db.Decimal(5, 2)
   service         AppointmentService
   startsAt        DateTime           @db.Timestamptz(3)
   endsAt          DateTime           @db.Timestamptz(3)

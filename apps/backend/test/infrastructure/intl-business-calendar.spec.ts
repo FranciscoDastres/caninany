@@ -23,4 +23,10 @@ describe("IntlBusinessCalendar", () => {
 
     expect(businessDay.opening.toISOString()).toBe("2026-01-20T12:00:00.000Z");
   });
+
+  it("resolves an instant to its Santiago calendar date", () => {
+    expect(
+      calendar.getDateForInstant(new Date("2026-06-20T02:00:00.000Z")),
+    ).toBe("2026-06-19");
+  });
 });

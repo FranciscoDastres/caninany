@@ -4,7 +4,10 @@ import { APP_FILTER } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
-import { BUSINESS_CALENDAR } from "./application/ports/business-calendar.port";
+import {
+  BUSINESS_CALENDAR,
+  type BusinessCalendar,
+} from "./application/ports/business-calendar.port";
 import { CLOCK } from "./application/ports/clock.port";
 import { ID_GENERATOR } from "./application/ports/id-generator.port";
 import {
@@ -16,10 +19,13 @@ import {
   type TokenIssuer,
 } from "./application/ports/token-issuer.port";
 import { AdminUsersService } from "./application/services/admin-users.service";
+import { ScheduleAppointmentService } from "./application/services/schedule-appointment.service";
 import { AuthApplicationService } from "./application/services/auth-application.service";
 import { PurchasesService } from "./application/services/purchases.service";
 import { SiteConfigurationService } from "./application/services/site-configuration.service";
 import { CreateAppointmentUseCase } from "./application/use-cases/create-appointment.use-case";
+import { CreatePublicAppointmentRequestUseCase } from "./application/use-cases/create-public-appointment-request.use-case";
+import { GetAppointmentCalendarUseCase } from "./application/use-cases/get-appointment-calendar.use-case";
 import { GetAvailableSlotsUseCase } from "./application/use-cases/get-available-slots.use-case";
 import {
   APPOINTMENT_REPOSITORY,
@@ -136,13 +142,26 @@ import { SystemClock } from "./infrastructure/time/system-clock";
       useExisting: IntlBusinessCalendar,
     },
     {
-      provide: CreateAppointmentUseCase,
-      inject: [APPOINTMENT_REPOSITORY, ID_GENERATOR, CLOCK],
+      provide: ScheduleAppointmentService,
+      inject: [APPOINTMENT_REPOSITORY, ID_GENERATOR, CLOCK, BUSINESS_CALENDAR],
       useFactory: (
         appointments: AppointmentRepository,
         ids: CryptoIdGenerator,
         clock: SystemClock,
-      ) => new CreateAppointmentUseCase(appointments, ids, clock),
+        calendar: BusinessCalendar,
+      ) => new ScheduleAppointmentService(appointments, ids, clock, calendar),
+    },
+    {
+      provide: CreateAppointmentUseCase,
+      inject: [ScheduleAppointmentService],
+      useFactory: (scheduler: ScheduleAppointmentService) =>
+        new CreateAppointmentUseCase(scheduler),
+    },
+    {
+      provide: CreatePublicAppointmentRequestUseCase,
+      inject: [ScheduleAppointmentService],
+      useFactory: (scheduler: ScheduleAppointmentService) =>
+        new CreatePublicAppointmentRequestUseCase(scheduler),
     },
     {
       provide: GetAvailableSlotsUseCase,
@@ -152,6 +171,15 @@ import { SystemClock } from "./infrastructure/time/system-clock";
         calendar: IntlBusinessCalendar,
         clock: SystemClock,
       ) => new GetAvailableSlotsUseCase(appointments, calendar, clock),
+    },
+    {
+      provide: GetAppointmentCalendarUseCase,
+      inject: [APPOINTMENT_REPOSITORY, BUSINESS_CALENDAR, CLOCK],
+      useFactory: (
+        appointments: AppointmentRepository,
+        calendar: IntlBusinessCalendar,
+        clock: SystemClock,
+      ) => new GetAppointmentCalendarUseCase(appointments, calendar, clock),
     },
     {
       provide: AuthApplicationService,
