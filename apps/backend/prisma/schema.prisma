@@ -42,17 +42,21 @@ model User {
 }
 
 model Pet {
-  id           String        @id @default(uuid()) @db.Uuid
-  ownerId      String        @db.Uuid
-  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  name         String
-  breed        String?
-  weightKg     Decimal       @db.Decimal(5, 2)
-  appointments Appointment[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id            String        @id @default(uuid()) @db.Uuid
+  ownerId       String        @db.Uuid
+  owner         User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name          String
+  breed         String?
+  weightKg      Decimal       @db.Decimal(5, 2)
+  dateOfBirth   DateTime?     @db.Date
+  medicalNotes  String?
+  behaviorNotes String?
+  archivedAt    DateTime?
+  appointments  Appointment[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
-  @@index([ownerId])
+  @@index([ownerId, archivedAt])
 }
 
 model Appointment {
