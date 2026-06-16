@@ -4,12 +4,8 @@ import { PET_WEIGHT_LIMITS } from "../constants/pet-weight.constants";
 import { APPOINTMENT_SERVICES } from "../contracts/appointment.contract";
 
 export const createAppointmentSchema = z.object({
-  customerId: z.uuid(),
+  customerId: z.uuid().optional(),
   petId: z.uuid(),
-  petWeightKg: z
-    .number()
-    .min(PET_WEIGHT_LIMITS.minKg)
-    .max(PET_WEIGHT_LIMITS.maxKg),
   service: z.enum(APPOINTMENT_SERVICES),
   startsAt: z.iso.datetime({ offset: true }),
   notes: z.string().trim().max(500).optional(),
