@@ -13,3 +13,4 @@ export class EmailAlreadyRegisteredError extends DomainError {}
 export class InvalidCredentialsError extends DomainError {}
 export class UserNotFoundError extends DomainError {}
 export class CannotChangeOwnRoleError extends DomainError {}
+export class PetNotFoundError extends DomainError {}
