@@ -22,6 +22,7 @@ import { AdminUsersService } from "./application/services/admin-users.service";
 import { ScheduleAppointmentService } from "./application/services/schedule-appointment.service";
 import { AuthApplicationService } from "./application/services/auth-application.service";
 import { PurchasesService } from "./application/services/purchases.service";
+import { PetsService } from "./application/services/pets.service";
 import { SiteConfigurationService } from "./application/services/site-configuration.service";
 import { CreateAppointmentUseCase } from "./application/use-cases/create-appointment.use-case";
 import { CreatePublicAppointmentRequestUseCase } from "./application/use-cases/create-public-appointment-request.use-case";
@@ -31,6 +32,10 @@ import {
   APPOINTMENT_REPOSITORY,
   type AppointmentRepository,
 } from "./domain/repositories/appointment.repository";
+import {
+  PET_REPOSITORY,
+  type PetRepository,
+} from "./domain/repositories/pet.repository";
 import {
   PURCHASE_REPOSITORY,
   type PurchaseRepository,
@@ -52,6 +57,7 @@ import { validateEnvironment } from "./infrastructure/config/environment";
 import { PrismaService } from "./infrastructure/database/prisma/prisma.service";
 import { PrismaAppointmentRepository } from "./infrastructure/database/prisma/repositories/prisma-appointment.repository";
 import { PrismaPurchaseRepository } from "./infrastructure/database/prisma/repositories/prisma-purchase.repository";
+import { PrismaPetRepository } from "./infrastructure/database/prisma/repositories/prisma-pet.repository";
 import { PrismaSiteConfigurationRepository } from "./infrastructure/database/prisma/repositories/prisma-site-configuration.repository";
 import { PrismaUserRepository } from "./infrastructure/database/prisma/repositories/prisma-user.repository";
 import { AuthController } from "./infrastructure/http/controllers/auth.controller";
@@ -59,6 +65,7 @@ import { DomainExceptionFilter } from "./infrastructure/http/domain-exception.fi
 import { AppointmentsController } from "./infrastructure/http/controllers/appointments.controller";
 import { HealthController } from "./infrastructure/http/controllers/health.controller";
 import { PurchasesController } from "./infrastructure/http/controllers/purchases.controller";
+import { PetsController } from "./infrastructure/http/controllers/pets.controller";
 import { SiteConfigurationController } from "./infrastructure/http/controllers/site-configuration.controller";
 import { UsersController } from "./infrastructure/http/controllers/users.controller";
 import { CryptoIdGenerator } from "./infrastructure/ids/crypto-id-generator";
@@ -86,6 +93,7 @@ import { SystemClock } from "./infrastructure/time/system-clock";
     AppointmentsController,
     AuthController,
     HealthController,
+    PetsController,
     PurchasesController,
     SiteConfigurationController,
     UsersController,
@@ -93,6 +101,7 @@ import { SystemClock } from "./infrastructure/time/system-clock";
   providers: [
     PrismaService,
     PrismaAppointmentRepository,
+    PrismaPetRepository,
     PrismaPurchaseRepository,
     PrismaSiteConfigurationRepository,
     PrismaUserRepository,
@@ -108,6 +117,10 @@ import { SystemClock } from "./infrastructure/time/system-clock";
     {
       provide: APPOINTMENT_REPOSITORY,
       useExisting: PrismaAppointmentRepository,
+    },
+    {
+      provide: PET_REPOSITORY,
+      useExisting: PrismaPetRepository,
     },
     {
       provide: PURCHASE_REPOSITORY,
@@ -153,9 +166,11 @@ import { SystemClock } from "./infrastructure/time/system-clock";
     },
     {
       provide: CreateAppointmentUseCase,
-      inject: [ScheduleAppointmentService],
-      useFactory: (scheduler: ScheduleAppointmentService) =>
-        new CreateAppointmentUseCase(scheduler),
+      inject: [ScheduleAppointmentService, PET_REPOSITORY],
+      useFactory: (
+        scheduler: ScheduleAppointmentService,
+        pets: PetRepository,
+      ) => new CreateAppointmentUseCase(scheduler, pets),
     },
     {
       provide: CreatePublicAppointmentRequestUseCase,
@@ -194,6 +209,12 @@ import { SystemClock } from "./infrastructure/time/system-clock";
       provide: AdminUsersService,
       inject: [USER_REPOSITORY],
       useFactory: (users: UserRepository) => new AdminUsersService(users),
+    },
+    {
+      provide: PetsService,
+      inject: [PET_REPOSITORY, ID_GENERATOR],
+      useFactory: (pets: PetRepository, ids: CryptoIdGenerator) =>
+        new PetsService(pets, ids),
     },
     {
       provide: PurchasesService,
