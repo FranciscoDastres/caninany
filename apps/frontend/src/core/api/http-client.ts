@@ -102,6 +102,8 @@ function isMessageResponse(value: unknown): value is { message?: unknown } {
 }
 
 export const httpClient = {
+  delete: <T>(path: string, config?: RequestConfig) =>
+    request<T>("DELETE", path, undefined, config),
   get: <T>(path: string, config?: RequestConfig) =>
     request<T>("GET", path, undefined, config),
   patch: <T>(path: string, body?: unknown, config?: RequestConfig) =>
