@@ -17,6 +17,7 @@ import {
   EmailAlreadyRegisteredError,
   InvalidCredentialsError,
   InvalidPetWeightError,
+  PetNotFoundError,
   UserNotFoundError,
 } from "../../domain/errors/domain.error";
 
@@ -28,6 +29,7 @@ import {
   EmailAlreadyRegisteredError,
   InvalidCredentialsError,
   UserNotFoundError,
+  PetNotFoundError,
   CannotChangeOwnRoleError,
 )
 export class DomainExceptionFilter implements ExceptionFilter {
@@ -40,6 +42,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
       | EmailAlreadyRegisteredError
       | InvalidCredentialsError
       | UserNotFoundError
+      | PetNotFoundError
       | CannotChangeOwnRoleError,
     host: ArgumentsHost,
   ): void {
@@ -50,7 +53,8 @@ export class DomainExceptionFilter implements ExceptionFilter {
         ? new ConflictException(exception.message)
         : exception instanceof InvalidCredentialsError
           ? new UnauthorizedException(exception.message)
-          : exception instanceof UserNotFoundError
+          : exception instanceof UserNotFoundError ||
+              exception instanceof PetNotFoundError
             ? new NotFoundException(exception.message)
             : exception instanceof CannotChangeOwnRoleError
               ? new BadRequestException(exception.message)
