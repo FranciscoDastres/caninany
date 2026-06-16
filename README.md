@@ -210,6 +210,10 @@ público siempre crea usuarios con rol `cliente`.
 - `POST /api/v1/auth/register`: registro de clientes.
 - `POST /api/v1/auth/login`: entrega JWT y usuario autenticado.
 - `GET /api/v1/auth/me`: perfil asociado al token.
+- `GET /api/v1/pets`: mascotas activas del cliente autenticado.
+- `POST /api/v1/pets`: crea una mascota para el cliente autenticado.
+- `PUT /api/v1/pets/:id`: actualiza una mascota propia.
+- `DELETE /api/v1/pets/:id`: archiva una mascota sin borrar su historial.
 - `GET /api/v1/compras/mis-compras`: compras del cliente autenticado.
 - `GET /api/v1/usuarios`: listado exclusivo para administradores.
 - `PATCH /api/v1/usuarios/:id/rol`: cambio de rol exclusivo para
