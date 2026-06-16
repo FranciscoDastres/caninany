@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -78,10 +86,16 @@ export class AppointmentsController {
     input: CreateAppointmentInput,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AppointmentDto> {
+    const customerId = user.role === "admin" ? input.customerId : user.id;
+    if (!customerId) {
+      throw new BadRequestException(
+        "Selecciona el cliente para crear la reserva.",
+      );
+    }
+
     return this.createAppointment.execute({
-      customerId: user.role === "admin" ? input.customerId : user.id,
+      customerId,
       petId: input.petId,
-      petWeightKg: input.petWeightKg,
       service: input.service,
       startsAt: new Date(input.startsAt),
       ...(input.notes ? { notes: input.notes } : {}),
