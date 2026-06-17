@@ -16,6 +16,7 @@
     "dev:down": "docker compose down",
     "dev:logs": "docker compose logs -f backend frontend db",
     "dev:status": "docker compose ps",
+    "dev:ui": "lazydocker",
     "dev:workspace": "corepack pnpm turbo run dev --parallel",
     "dev:backend": "corepack pnpm --filter @caninany/backend dev",
     "dev:frontend": "corepack pnpm --filter @caninany/frontend dev",
@@ -29,7 +30,8 @@
     "db:migrate": "pnpm --filter @caninany/backend prisma:migrate",
     "db:studio": "pnpm --filter @caninany/backend prisma:studio",
     "docker:dev": "npm run dev",
-    "docker:down": "npm run dev:down"
+    "docker:down": "npm run dev:down",
+    "docker:ui": "npm run dev:ui"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

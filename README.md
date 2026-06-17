@@ -156,6 +156,34 @@ caninany/
 
 ## Desarrollo local
 
+### Requisito: Docker nativo en WSL
+
+El proyecto está pensado para ejecutarse desde la distro WSL, usando el socket
+local de Linux (`/var/run/docker.sock`). Si `docker version` no responde dentro
+de WSL, instala y arranca Docker Engine en Ubuntu:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io docker-compose-v2
+sudo systemctl enable --now docker || sudo service docker start
+sudo usermod -aG docker "$USER"
+newgrp docker
+```
+
+Verifica que el CLI apunte al engine de WSL y no a Docker Desktop:
+
+```bash
+which docker
+docker version
+docker compose version
+ls -l /var/run/docker.sock
+```
+
+`which docker` debe resolver a un binario local de Ubuntu y `docker version`
+debe mostrar cliente y servidor. Si vuelve a aparecer una ruta bajo
+`/mnt/wsl/docker-desktop`, desactiva la integración de Docker Desktop para esta
+distro o cierra Docker Desktop antes de abrir WSL.
+
 ### Opción recomendada: un solo comando
 
 Desde WSL, entra a la raíz del repositorio:
@@ -179,6 +207,9 @@ npm run dev:logs
 
 # Ver estado
 npm run dev:status
+
+# Abrir vista interactiva en lazydocker
+npm run dev:ui
 
 # Detener los servicios
 npm run dev:down
