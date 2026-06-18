@@ -72,7 +72,7 @@ export function GallerySection(): JSX.Element {
               <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#e1a985]">
                 Momentos Caninany
               </p>
-              <h2 className="mt-5 max-w-2xl font-display text-5xl leading-[0.98] sm:text-6xl">
+              <h2 className="mt-5 max-w-2xl font-display text-4xl leading-[1.06] sm:text-5xl">
                 El cuidado también puede verse así de bonito.
               </h2>
             </div>
@@ -154,7 +154,7 @@ export function GallerySection(): JSX.Element {
             />
             <div className="p-6 sm:p-8">
               <p className="eyebrow">{selected.category}</p>
-              <h3 className="mt-2 font-display text-3xl text-[#183c2d]">
+              <h3 className="mt-2 font-display text-2xl text-[#183c2d]">
                 {selected.title}
               </h3>
               <p className="mt-2 text-[#66766e]">{selected.description}</p>
