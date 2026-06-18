@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans:
+    "Nunito Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-display:
+    Manrope, "Nunito Sans", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
 :root {
-  font-family:
-    "Avenir Next",
-    Avenir,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
   color: #1d2b24;
   background: #fffaf3;
   font-synthesis: none;
@@ -49,13 +50,9 @@ a {
 }
 
 .font-display {
-  font-family:
-    Iowan Old Style,
-    Baskerville,
-    "Times New Roman",
-    ui-serif,
-    serif;
-  letter-spacing: -0.035em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .eyebrow {

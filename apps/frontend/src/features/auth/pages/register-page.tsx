@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/core/api/get-api-error";
 import { useAuthStore } from "@/store/auth.store";
@@ -43,29 +44,29 @@ export function RegisterPage(): JSX.Element {
       description="Regístrate como cliente para mantener tus compras y comprobantes ordenados."
     >
       <form className="grid gap-5" onSubmit={onSubmit}>
-        <RegisterField label="Nombre" error={errors.name?.message}>
+        <FormField label="Nombre" error={errors.name?.message}>
           <Input
             autoComplete="name"
             placeholder="Tu nombre"
             {...register("name")}
           />
-        </RegisterField>
-        <RegisterField label="Correo" error={errors.email?.message}>
+        </FormField>
+        <FormField label="Correo" error={errors.email?.message}>
           <Input
             type="email"
             autoComplete="email"
             placeholder="tu@correo.cl"
             {...register("email")}
           />
-        </RegisterField>
-        <RegisterField label="Contraseña" error={errors.password?.message}>
+        </FormField>
+        <FormField label="Contraseña" error={errors.password?.message}>
           <Input
             type="password"
             autoComplete="new-password"
             placeholder="Mínimo 8 caracteres"
             {...register("password")}
           />
-        </RegisterField>
+        </FormField>
         {serverError ? (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
             {serverError}
@@ -87,27 +88,5 @@ export function RegisterPage(): JSX.Element {
         </Link>
       </p>
     </AuthLayout>
-  );
-}
-
-interface RegisterFieldProps {
-  children: React.ReactNode;
-  error?: string | undefined;
-  label: string;
-}
-
-function RegisterField({
-  children,
-  error,
-  label,
-}: RegisterFieldProps): JSX.Element {
-  return (
-    <label className="grid gap-2 text-sm font-extrabold text-[#344e41]">
-      {label}
-      {children}
-      {error ? (
-        <span className="text-xs font-semibold text-red-700">{error}</span>
-      ) : null}
-    </label>
   );
 }

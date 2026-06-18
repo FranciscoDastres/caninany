@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/core/api/get-api-error";
 import { useSiteConfiguration } from "@/features/site-configuration/hooks/use-site-configuration";
@@ -88,21 +89,21 @@ export function SiteContentEditor(): JSX.Element {
       ) : (
         <form className="grid gap-6 p-6 sm:p-8" onSubmit={onSubmit}>
           <div className="grid gap-5 lg:grid-cols-2">
-            <EditorField
+            <FormField
               label="Título principal"
               error={errors.heroTitle?.message}
             >
               <Input {...register("heroTitle")} />
-            </EditorField>
-            <EditorField
+            </FormField>
+            <FormField
               label="Texto destacado"
               error={errors.heroHighlight?.message}
             >
               <Input {...register("heroHighlight")} />
-            </EditorField>
+            </FormField>
           </div>
 
-          <EditorField
+          <FormField
             label="Descripción principal"
             error={errors.heroDescription?.message}
           >
@@ -110,16 +111,16 @@ export function SiteContentEditor(): JSX.Element {
               className="form-control min-h-28 resize-y py-3"
               {...register("heroDescription")}
             />
-          </EditorField>
+          </FormField>
 
           <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
             <div className="grid content-start gap-4">
-              <EditorField
+              <FormField
                 label="Ruta de la imagen"
                 error={errors.heroImageUrl?.message}
               >
                 <Input {...register("heroImageUrl")} />
-              </EditorField>
+              </FormField>
               <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#cfc5b8] px-5 py-3 text-sm font-extrabold text-[#214e3b]">
                 <ImageUp className="size-4" />
                 {imageMutation.isPending ? "Subiendo..." : "Subir imagen"}
@@ -150,21 +151,21 @@ export function SiteContentEditor(): JSX.Element {
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            <EditorField
+            <FormField
               label="Etiqueta de servicios"
               error={errors.servicesEyebrow?.message}
             >
               <Input {...register("servicesEyebrow")} />
-            </EditorField>
-            <EditorField
+            </FormField>
+            <FormField
               label="Título de servicios"
               error={errors.servicesTitle?.message}
             >
               <Input {...register("servicesTitle")} />
-            </EditorField>
+            </FormField>
           </div>
 
-          <EditorField
+          <FormField
             label="Descripción de servicios"
             error={errors.servicesDescription?.message}
           >
@@ -172,7 +173,7 @@ export function SiteContentEditor(): JSX.Element {
               className="form-control min-h-24 resize-y py-3"
               {...register("servicesDescription")}
             />
-          </EditorField>
+          </FormField>
 
           {message ? (
             <p className="rounded-xl bg-[#eef2e8] px-4 py-3 text-sm font-semibold text-[#315f49]">
@@ -191,27 +192,5 @@ export function SiteContentEditor(): JSX.Element {
         </form>
       )}
     </article>
-  );
-}
-
-interface EditorFieldProps {
-  children: React.ReactNode;
-  error?: string | undefined;
-  label: string;
-}
-
-function EditorField({
-  children,
-  error,
-  label,
-}: EditorFieldProps): JSX.Element {
-  return (
-    <label className="grid gap-2 text-sm font-extrabold text-[#344e41]">
-      {label}
-      {children}
-      {error ? (
-        <span className="text-xs font-semibold text-red-700">{error}</span>
-      ) : null}
-    </label>
   );
 }

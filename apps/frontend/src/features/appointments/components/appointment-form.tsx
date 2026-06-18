@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useForm, type UseFormRegister } from "react-hook-form";
 
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/core/api/get-api-error";
 
@@ -146,10 +147,13 @@ export function AppointmentForm(): JSX.Element {
       <div>
         <p className="eyebrow">Sobre tu mascota</p>
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
-          <Field label="Nombre de tu mascota" error={errors.petName?.message}>
+          <FormField
+            label="Nombre de tu mascota"
+            error={errors.petName?.message}
+          >
             <Input placeholder="Ej. Milo" {...register("petName")} />
-          </Field>
-          <Field
+          </FormField>
+          <FormField
             label="Peso aproximado (kg)"
             error={errors.petWeightKg?.message}
             hint="La duración se calcula usando este peso."
@@ -162,7 +166,7 @@ export function AppointmentForm(): JSX.Element {
               placeholder="Ej. 12"
               {...register("petWeightKg", { valueAsNumber: true })}
             />
-          </Field>
+          </FormField>
         </div>
       </div>
 
@@ -194,25 +198,25 @@ export function AppointmentForm(): JSX.Element {
       <div>
         <p className="eyebrow">Tus datos de contacto</p>
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
-          <Field label="Tu nombre" error={errors.ownerName?.message}>
+          <FormField label="Tu nombre" error={errors.ownerName?.message}>
             <Input
               placeholder="¿Cómo te llamas?"
               autoComplete="name"
               {...register("ownerName")}
             />
-          </Field>
-          <Field label="WhatsApp" error={errors.phone?.message}>
+          </FormField>
+          <FormField label="WhatsApp" error={errors.phone?.message}>
             <Input
               type="tel"
               placeholder="+56 9 1234 5678"
               autoComplete="tel"
               {...register("phone")}
             />
-          </Field>
+          </FormField>
         </div>
       </div>
 
-      <Field
+      <FormField
         label="Correo (opcional)"
         error={errors.email?.message}
         hint="Lo usaremos solo para enviarte información sobre tu solicitud."
@@ -223,9 +227,9 @@ export function AppointmentForm(): JSX.Element {
           autoComplete="email"
           {...register("email")}
         />
-      </Field>
+      </FormField>
 
-      <Field
+      <FormField
         label="¿Hay algo que debamos saber?"
         error={errors.notes?.message}
         hint="Por ejemplo: si se pone nervioso, tiene piel sensible o necesita pausas."
@@ -235,7 +239,7 @@ export function AppointmentForm(): JSX.Element {
           placeholder="Cuéntanos un poquito sobre su personalidad..."
           {...register("notes")}
         />
-      </Field>
+      </FormField>
 
       {serverError ? (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
@@ -318,30 +322,6 @@ function ServiceSelector({
         <p className="mt-2 text-xs font-semibold text-red-700">{error}</p>
       ) : null}
     </div>
-  );
-}
-
-interface FieldProps {
-  children: React.ReactNode;
-  error?: string | undefined;
-  hint?: string;
-  label: string;
-}
-
-function Field({ children, error, hint, label }: FieldProps): JSX.Element {
-  return (
-    <label className="grid gap-2 text-sm font-extrabold text-[#344e41]">
-      <span>{label}</span>
-      {children}
-      {hint && !error ? (
-        <span className="text-xs font-normal leading-5 text-[#849088]">
-          {hint}
-        </span>
-      ) : null}
-      {error ? (
-        <span className="text-xs font-semibold text-red-700">{error}</span>
-      ) : null}
-    </label>
   );
 }
 

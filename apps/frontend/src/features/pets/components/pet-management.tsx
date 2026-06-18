@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/core/api/get-api-error";
 
@@ -154,16 +155,19 @@ export function PetManagement(): JSX.Element {
           onSubmit={onSubmit}
         >
           <div className="grid gap-5 sm:grid-cols-2">
-            <PetField label="Nombre" error={errors.name?.message}>
+            <FormField label="Nombre" error={errors.name?.message}>
               <Input placeholder="Ej. Milo" {...register("name")} />
-            </PetField>
-            <PetField label="Raza" error={errors.breed?.message}>
+            </FormField>
+            <FormField label="Raza" error={errors.breed?.message}>
               <Input
                 placeholder="Ej. Mestizo o Poodle"
                 {...register("breed")}
               />
-            </PetField>
-            <PetField label="Peso actual (kg)" error={errors.weightKg?.message}>
+            </FormField>
+            <FormField
+              label="Peso actual (kg)"
+              error={errors.weightKg?.message}
+            >
               <Input
                 type="number"
                 min={PET_WEIGHT_LIMITS.minKg}
@@ -171,17 +175,17 @@ export function PetManagement(): JSX.Element {
                 step="0.1"
                 {...register("weightKg", { valueAsNumber: true })}
               />
-            </PetField>
-            <PetField
+            </FormField>
+            <FormField
               label="Fecha de nacimiento"
               error={errors.dateOfBirth?.message}
             >
               <Input type="date" {...register("dateOfBirth")} />
-            </PetField>
+            </FormField>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            <PetField
+            <FormField
               label="Cuidados de salud"
               error={errors.medicalNotes?.message}
               hint="Alergias, piel sensible, tratamientos o cuidados relevantes."
@@ -190,8 +194,8 @@ export function PetManagement(): JSX.Element {
                 className="form-control min-h-28 resize-y py-3"
                 {...register("medicalNotes")}
               />
-            </PetField>
-            <PetField
+            </FormField>
+            <FormField
               label="Personalidad y comportamiento"
               error={errors.behaviorNotes?.message}
               hint="Miedos, señales de estrés y la mejor forma de acompañarle."
@@ -200,7 +204,7 @@ export function PetManagement(): JSX.Element {
                 className="form-control min-h-28 resize-y py-3"
                 {...register("behaviorNotes")}
               />
-            </PetField>
+            </FormField>
           </div>
 
           <button
@@ -326,34 +330,5 @@ function PetCard({
         </button>
       </div>
     </section>
-  );
-}
-
-interface PetFieldProps {
-  children: React.ReactNode;
-  error?: string | undefined;
-  hint?: string;
-  label: string;
-}
-
-function PetField({
-  children,
-  error,
-  hint,
-  label,
-}: PetFieldProps): JSX.Element {
-  return (
-    <label className="grid gap-2 text-sm font-extrabold text-[#344e41]">
-      {label}
-      {children}
-      {hint && !error ? (
-        <span className="text-xs font-normal leading-5 text-[#849088]">
-          {hint}
-        </span>
-      ) : null}
-      {error ? (
-        <span className="text-xs font-semibold text-red-700">{error}</span>
-      ) : null}
-    </label>
   );
 }

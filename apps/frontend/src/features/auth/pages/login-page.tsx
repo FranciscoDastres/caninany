@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/core/api/get-api-error";
 import { useAuthStore } from "@/store/auth.store";
@@ -50,22 +51,22 @@ export function LoginPage(): JSX.Element {
       description="Ingresa para revisar tus compras y comprobantes."
     >
       <form className="grid gap-5" onSubmit={onSubmit}>
-        <AuthField label="Correo" error={errors.email?.message}>
+        <FormField label="Correo" error={errors.email?.message}>
           <Input
             type="email"
             autoComplete="email"
             placeholder="tu@correo.cl"
             {...register("email")}
           />
-        </AuthField>
-        <AuthField label="Contraseña" error={errors.password?.message}>
+        </FormField>
+        <FormField label="Contraseña" error={errors.password?.message}>
           <Input
             type="password"
             autoComplete="current-password"
             placeholder="Tu contraseña"
             {...register("password")}
           />
-        </AuthField>
+        </FormField>
         {serverError ? (
           <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
             {serverError}
@@ -87,23 +88,5 @@ export function LoginPage(): JSX.Element {
         </Link>
       </p>
     </AuthLayout>
-  );
-}
-
-interface AuthFieldProps {
-  children: React.ReactNode;
-  error?: string | undefined;
-  label: string;
-}
-
-function AuthField({ children, error, label }: AuthFieldProps): JSX.Element {
-  return (
-    <label className="grid gap-2 text-sm font-extrabold text-[#344e41]">
-      {label}
-      {children}
-      {error ? (
-        <span className="text-xs font-semibold text-red-700">{error}</span>
-      ) : null}
-    </label>
   );
 }
