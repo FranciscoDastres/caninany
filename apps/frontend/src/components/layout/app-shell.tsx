@@ -35,7 +35,7 @@ export function AppShell({ children }: PropsWithChildren): JSX.Element {
                 Caninany
               </span>
               <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#b16d4b]">
-                Pet care studio
+                Baño y oídos
               </span>
             </span>
           </Link>
