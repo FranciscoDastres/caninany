@@ -19,6 +19,7 @@ import { useCreatePublicAppointmentRequest } from "../hooks/use-create-public-ap
 import { AppointmentCalendar } from "./appointment-calendar";
 
 const serviceOptions: Array<{
+  badge?: string;
   description: string;
   icon: typeof Bath;
   label: string;
@@ -27,20 +28,21 @@ const serviceOptions: Array<{
   {
     value: "bath",
     label: "Baño",
-    description: "Limpieza, secado y cepillado",
+    description: "Limpieza, secado y cepillado.",
     icon: Bath,
   },
   {
     value: "ear-cleaning",
     label: "Oídos",
-    description: "Limpieza externa delicada",
+    description: "Limpieza externa delicada.",
     icon: Ear,
   },
   {
     value: "bath-and-ear-cleaning",
-    label: "Completo",
-    description: "Baño + limpieza de oídos",
+    label: "Baño + oídos",
+    description: "La visita completa en un solo bloque.",
     icon: Sparkles,
+    badge: "Recomendado",
   },
 ];
 
@@ -137,7 +139,7 @@ export function AppointmentForm(): JSX.Element {
   }
 
   return (
-    <form className="grid gap-8" onSubmit={onSubmit}>
+    <form className="grid gap-6" onSubmit={onSubmit}>
       <ServiceSelector
         selectedService={selectedService}
         register={register}
@@ -173,8 +175,7 @@ export function AppointmentForm(): JSX.Element {
       <div>
         <p className="eyebrow">Agenda disponible</p>
         <p className="mt-2 text-sm leading-6 text-[#75827b]">
-          Los bloques marcados como “Pedido” ya están ocupados. La información
-          personal de otras reservas permanece privada.
+          Elige un bloque compatible con el peso y servicio de tu mascota.
         </p>
         <div className="mt-4">
           <input type="hidden" {...register("startsAt")} />
@@ -279,17 +280,17 @@ function ServiceSelector({
   return (
     <div>
       <p className="eyebrow">Elige su cuidado</p>
-      <h3 className="mt-2 font-display text-3xl text-[#183c2d]">
+      <h3 className="mt-2 font-display text-2xl text-[#183c2d]">
         ¿Qué necesita esta vez?
       </h3>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
         {serviceOptions.map((option) => {
           const selected = selectedService === option.value;
 
           return (
             <label
               key={option.value}
-              className={`relative cursor-pointer rounded-[1.4rem] border p-4 transition ${
+              className={`relative cursor-pointer rounded-[1.15rem] border p-4 transition ${
                 selected
                   ? "border-[#214e3b] bg-[#e8efe8] shadow-sm"
                   : "border-[#dfd7cc] bg-white hover:border-[#9eb1a5]"
@@ -305,13 +306,18 @@ function ServiceSelector({
                 className={`size-6 ${selected ? "text-[#214e3b]" : "text-[#b16d4b]"}`}
                 strokeWidth={1.8}
               />
+              {option.badge ? (
+                <span className="absolute right-3 top-3 rounded-full bg-[#214e3b] px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-white">
+                  {option.badge}
+                </span>
+              ) : null}
               <span className="mt-3 block font-extrabold text-[#2b483a]">
                 {option.label}
               </span>
               <span className="mt-1 block text-xs leading-5 text-[#75827b]">
                 {option.description}
               </span>
-              {selected ? (
+              {selected && !option.badge ? (
                 <CheckCircle2 className="absolute right-3 top-3 size-4 text-[#214e3b]" />
               ) : null}
             </label>
