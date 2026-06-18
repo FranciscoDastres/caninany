@@ -48,20 +48,20 @@ export function DeferredAppointmentForm(): JSX.Element {
 function AppointmentFormPlaceholder(): JSX.Element {
   return (
     <div
-      className="grid min-h-[760px] animate-pulse content-start gap-7"
+      className="grid min-h-[560px] animate-pulse content-start gap-5"
       aria-label="Preparando formulario de reserva"
       role="status"
     >
       <span className="h-5 w-36 rounded-full bg-[#e8e1d7]" />
-      <span className="h-10 w-3/4 rounded-xl bg-[#e8e1d7]" />
+      <span className="h-8 w-2/3 rounded-xl bg-[#e8e1d7]" />
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }, (_, index) => (
-          <span key={index} className="h-32 rounded-[1.4rem] bg-[#eee8df]" />
+          <span key={index} className="h-28 rounded-[1.15rem] bg-[#eee8df]" />
         ))}
       </div>
       <span className="h-14 rounded-xl bg-[#eee8df]" />
       <span className="h-14 rounded-xl bg-[#eee8df]" />
-      <span className="h-64 rounded-[1.75rem] bg-[#eee8df]" />
+      <span className="h-40 rounded-[1.5rem] bg-[#eee8df]" />
     </div>
   );
 }
