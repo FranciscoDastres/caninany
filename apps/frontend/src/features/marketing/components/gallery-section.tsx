@@ -64,7 +64,7 @@ export function GallerySection(): JSX.Element {
     <>
       <section
         id="galeria"
-        className="deferred-section bg-[#183c2d] px-5 py-24 text-white sm:px-8 lg:py-32"
+        className="deferred-section bg-[#183c2d] px-5 py-16 text-white sm:px-8 lg:py-24"
       >
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
