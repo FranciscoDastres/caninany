@@ -26,7 +26,7 @@ export function ClientProfilePage(): JSX.Element {
         <p className="eyebrow">Mi perfil</p>
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="font-display text-5xl text-[#183c2d]">
+            <h1 className="font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
               Hola, {user?.name}.
             </h1>
             <p className="mt-3 text-[#66766e]">
