@@ -125,7 +125,7 @@ export function HomePage(): JSX.Element {
               <PawPrint className="size-4 text-[#c27650]" />
               Bienestar con cariño
             </div>
-            <h1 className="font-display text-5xl leading-[0.96] text-[#183c2d] sm:text-7xl lg:text-[5.6rem]">
+            <h1 className="font-display text-4xl leading-[1.03] text-[#183c2d] sm:text-6xl lg:text-[4.9rem]">
               {content.heroTitle}
               <span className="block text-[#b96f4b]">
                 {content.heroHighlight}
@@ -208,7 +208,7 @@ export function HomePage(): JSX.Element {
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
             <p className="eyebrow">{content.servicesEyebrow}</p>
-            <h2 className="mt-5 font-display text-5xl leading-[1.02] text-[#183c2d] sm:text-6xl">
+            <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
               {content.servicesTitle}
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[#6b7971]">
@@ -232,7 +232,7 @@ export function HomePage(): JSX.Element {
                 </div>
                 <div className="mt-8 flex items-start justify-between gap-5">
                   <div>
-                    <h3 className="font-display text-3xl text-[#183c2d]">
+                    <h3 className="font-display text-2xl text-[#183c2d]">
                       {service.name}
                     </h3>
                     <p className="mt-4 leading-7 text-[#6d7b73]">
@@ -282,7 +282,7 @@ export function HomePage(): JSX.Element {
 
           <div className="lg:pl-10">
             <p className="eyebrow">Una experiencia diferente</p>
-            <h2 className="mt-5 font-display text-5xl leading-[1.02] text-[#183c2d] sm:text-6xl">
+            <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
               Menos estrés. Más confianza.
             </h2>
             <p className="mt-6 text-lg leading-8 text-[#64746b]">
@@ -336,7 +336,7 @@ export function HomePage(): JSX.Element {
         <div className="mx-auto max-w-7xl">
           <div className="text-center">
             <p className="eyebrow">Así de simple</p>
-            <h2 className="mt-5 font-display text-5xl text-[#183c2d] sm:text-6xl">
+            <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
               Tres pasos. Cero complicaciones.
             </h2>
           </div>
@@ -354,7 +354,7 @@ export function HomePage(): JSX.Element {
                 <span className="mt-7 block text-xs font-extrabold tracking-[0.22em] text-[#c07854]">
                   PASO {step.number}
                 </span>
-                <h3 className="mt-3 font-display text-3xl text-[#183c2d]">
+                <h3 className="mt-3 font-display text-2xl text-[#183c2d]">
                   {step.title}
                 </h3>
                 <p className="mx-auto mt-3 max-w-xs leading-7 text-[#6d7b73]">
@@ -376,7 +376,7 @@ export function HomePage(): JSX.Element {
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr]">
             <div>
               <p className="eyebrow">Lo dicen sus humanos</p>
-              <h2 className="mt-5 font-display text-5xl leading-[1.02] text-[#183c2d] sm:text-6xl">
+              <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
                 Buenas experiencias dejan huella.
               </h2>
               <div className="mt-7 flex items-center gap-4">
@@ -406,7 +406,7 @@ export function HomePage(): JSX.Element {
                   </div>
                   <blockquote
                     className={`mt-6 font-display leading-tight text-[#244435] ${
-                      index === 0 ? "text-3xl sm:text-4xl" : "text-2xl"
+                      index === 0 ? "text-2xl sm:text-3xl" : "text-xl"
                     }`}
                   >
                     “{review.quote}”
@@ -436,7 +436,7 @@ export function HomePage(): JSX.Element {
             <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#ffe2d2]">
               Reserva su próxima visita
             </p>
-            <h2 className="mt-5 font-display text-5xl leading-[1] sm:text-6xl">
+            <h2 className="mt-5 font-display text-4xl leading-[1.06] sm:text-5xl">
               Su momento de cuidado empieza aquí.
             </h2>
             <p className="mt-6 max-w-md text-lg leading-8 text-[#fff0e7]">
