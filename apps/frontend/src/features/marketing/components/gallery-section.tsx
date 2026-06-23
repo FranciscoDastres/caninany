@@ -1,6 +1,6 @@
 import { ArrowUpRight, X } from "lucide-react";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface GalleryItem {
   alt: string;
@@ -16,14 +16,14 @@ const galleryItems: GalleryItem[] = [
     alt: "Perrito blanco disfrutando un baño suave",
     category: "Baño",
     title: "Una pausa para relajarse",
-    description: "Agua tibia, productos suaves y mucho cariño.",
+    description: "Agua tibia, productos suaves y un proceso sin apuros.",
   },
   {
     image: "/images/ear-care.webp",
     alt: "Spaniel recibiendo limpieza externa de oídos",
     category: "Bienestar",
     title: "Cuidado atento y delicado",
-    description: "Revisión y limpieza externa sin apuros.",
+    description: "Revisión y limpieza externa respetando cada señal.",
   },
   {
     image: "/images/happy-clients.webp",
@@ -37,131 +37,129 @@ const galleryItems: GalleryItem[] = [
     alt: "Golden retriever recién bañado en Caninany",
     category: "Resultado",
     title: "Limpios, suaves y radiantes",
-    description: "Ese brillo que se nota desde que salen.",
+    description: "Ese bienestar que se nota desde que salen.",
   },
 ];
 
 export function GallerySection(): JSX.Element {
   const [selected, setSelected] = useState<GalleryItem | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (!selected) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
 
-    const closeOnEscape = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") setSelected(null);
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", closeOnEscape);
-    };
+    if (selected && !dialog.open) dialog.showModal();
+    if (!selected && dialog.open) dialog.close();
   }, [selected]);
 
   return (
     <>
       <section
         id="galeria"
-        className="deferred-section bg-[#183c2d] px-5 py-16 text-white sm:px-8 lg:py-24"
+        className="deferred-section section-pad bg-brand-deep text-white"
       >
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div className="site-container">
+          <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-end">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#e1a985]">
+              <p className="inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.18em] text-brand-yellow">
+                <span className="h-0.5 w-7 bg-brand-yellow" />
                 Momentos Caninany
               </p>
-              <h2 className="mt-5 max-w-2xl font-display text-4xl leading-[1.06] sm:text-5xl">
-                El cuidado también puede verse así de bonito.
+              <h2 className="section-title mt-5 max-w-2xl text-white">
+                El cuidado también puede verse así de tranquilo.
               </h2>
             </div>
-            <p className="max-w-md leading-7 text-[#c8d4cd]">
-              Conoce nuestro espacio, la forma en que trabajamos y algunas de
-              las visitas que nos alegran la semana.
+            <p className="max-w-xl text-lg leading-8 text-[#ded2e0] lg:justify-self-end">
+              Conoce nuestra forma de trabajar y algunas de las visitas que
+              hacen especial cada semana.
             </p>
           </div>
 
-          <div className="mt-14 grid auto-rows-[260px] gap-4 sm:grid-cols-2 lg:grid-cols-12 lg:auto-rows-[280px]">
+          <div className="mt-14 grid auto-rows-[250px] gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:auto-rows-[285px]">
             {galleryItems.map((item, index) => (
               <button
                 key={item.title}
                 type="button"
-                className={`image-reveal group relative rounded-[2rem] text-left ${
+                className={`image-reveal group relative text-left ${
                   index === 0
-                    ? "lg:col-span-4 lg:row-span-2"
+                    ? "lg:col-span-5 lg:row-span-2"
                     : index === 1
-                      ? "lg:col-span-4"
+                      ? "lg:col-span-7"
                       : index === 2
                         ? "lg:col-span-4"
-                        : "lg:col-span-8"
+                        : "lg:col-span-3"
                 }`}
+                aria-label={`Ampliar: ${item.title}`}
                 onClick={() => setSelected(item)}
               >
                 <img
                   src={item.image}
-                  alt={item.alt}
+                  alt=""
                   className="absolute inset-0 size-full object-cover"
                   loading="lazy"
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent" />
-                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-6">
+                <span className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/8 to-transparent" />
+                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
                   <span>
-                    <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#f0b891]">
+                    <span className="text-[0.65rem] font-extrabold uppercase tracking-[0.18em] text-brand-yellow">
                       {item.category}
                     </span>
-                    <span className="mt-2 block text-xl font-bold">
+                    <span className="mt-2 block text-lg font-extrabold leading-tight sm:text-xl">
                       {item.title}
                     </span>
                   </span>
-                  <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-[#183c2d] transition-transform group-hover:rotate-45">
+                  <span className="grid size-10 shrink-0 place-items-center bg-white text-brand-deep transition group-hover:bg-brand-yellow">
                     <ArrowUpRight className="size-5" />
                   </span>
                 </span>
               </button>
             ))}
           </div>
-
-          <p className="mt-8 text-center text-sm text-[#9fb2a8]">
-            La galería está preparada para seguir creciendo con nuevas visitas.
-          </p>
         </div>
       </section>
 
-      {selected ? (
-        <div
-          className="fixed inset-0 z-[70] grid place-items-center bg-[#0c2118]/90 p-4 backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-          aria-label={selected.title}
-          onMouseDown={(event) => {
-            if (event.currentTarget === event.target) setSelected(null);
-          }}
-        >
-          <div className="relative w-full max-w-5xl overflow-hidden rounded-[2rem] bg-[#fffaf3] shadow-2xl">
-            <button
-              type="button"
-              className="absolute right-4 top-4 z-10 grid size-11 place-items-center rounded-full bg-white/90 text-[#183c2d] shadow-lg"
-              aria-label="Cerrar imagen"
-              onClick={() => setSelected(null)}
-            >
-              <X className="size-5" />
-            </button>
-            <img
-              src={selected.image}
-              alt={selected.alt}
-              className="max-h-[72vh] w-full object-cover"
-            />
+      <dialog
+        ref={dialogRef}
+        className="m-auto w-[min(calc(100%_-_2rem),64rem)] max-w-none overflow-hidden bg-brand-cream p-0 text-brand-ink shadow-2xl"
+        aria-labelledby="gallery-dialog-title"
+        onClose={() => setSelected(null)}
+        onMouseDown={(event) => {
+          if (event.target === event.currentTarget) {
+            event.currentTarget.close();
+          }
+        }}
+      >
+        {selected ? (
+          <div>
+            <div className="relative">
+              <button
+                type="button"
+                className="absolute right-4 top-4 z-10 grid size-11 place-items-center bg-white text-brand-deep shadow-lg"
+                aria-label="Cerrar imagen"
+                onClick={() => dialogRef.current?.close()}
+              >
+                <X className="size-5" />
+              </button>
+              <img
+                src={selected.image}
+                alt={selected.alt}
+                className="max-h-[68vh] w-full object-cover"
+              />
+            </div>
             <div className="p-6 sm:p-8">
               <p className="eyebrow">{selected.category}</p>
-              <h3 className="mt-2 font-display text-2xl text-[#183c2d]">
+              <h3
+                id="gallery-dialog-title"
+                className="mt-2 font-display text-2xl text-brand-deep sm:text-3xl"
+              >
                 {selected.title}
               </h3>
-              <p className="mt-2 text-[#66766e]">{selected.description}</p>
+              <p className="mt-3 text-brand-muted">{selected.description}</p>
             </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </dialog>
     </>
   );
 }
