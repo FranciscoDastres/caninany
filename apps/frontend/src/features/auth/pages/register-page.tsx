@@ -68,22 +68,25 @@ export function RegisterPage(): JSX.Element {
           />
         </FormField>
         {serverError ? (
-          <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          <p
+            role="alert"
+            className="bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+          >
             {serverError}
           </p>
         ) : null}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-13 items-center justify-center gap-3 rounded-full bg-[#214e3b] px-7 text-sm font-extrabold text-white transition hover:bg-[#183c2d] disabled:opacity-60"
+          className="inline-flex h-13 items-center justify-center gap-3 bg-brand-primary px-7 text-sm font-extrabold text-white transition hover:bg-brand-deep disabled:opacity-60"
         >
           <UserPlus className="size-4" />
           {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
         </button>
       </form>
-      <p className="mt-6 text-center text-sm text-[#6d7b73]">
+      <p className="mt-6 text-center text-sm text-[#756e77]">
         ¿Ya tienes una cuenta?{" "}
-        <Link className="font-extrabold text-[#214e3b]" to="/ingresar">
+        <Link className="font-extrabold text-[#8f6291]" to="/ingresar">
           Ingresar
         </Link>
       </p>
