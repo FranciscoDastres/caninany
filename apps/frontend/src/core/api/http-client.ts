@@ -28,6 +28,7 @@ async function request<T>(
   path: string,
   body?: unknown,
   config: RequestConfig = {},
+  allowRefresh = true,
 ): Promise<HttpResponse<T>> {
   const controller = new AbortController();
   const timeout = window.setTimeout(
@@ -35,7 +36,7 @@ async function request<T>(
     REQUEST_TIMEOUT_MS,
   );
   const headers = new Headers(config.headers);
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = useAuthStore.getState().accessToken;
   const isFormData = body instanceof FormData;
 
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
@@ -46,6 +47,7 @@ async function request<T>(
 
   try {
     const response = await fetch(buildUrl(path, config.params), {
+      credentials: "include",
       method,
       headers,
       signal: controller.signal,
@@ -54,6 +56,20 @@ async function request<T>(
         : { body: isFormData ? body : JSON.stringify(body) }),
     });
     const data = await parseResponse(response);
+
+    if (
+      response.status === 401 &&
+      allowRefresh &&
+      accessToken &&
+      path !== "/auth/refresh"
+    ) {
+      try {
+        await renewAuthSession();
+        return request<T>(method, path, body, config, false);
+      } catch {
+        useAuthStore.getState().clearSession();
+      }
+    }
 
     if (!response.ok) {
       const message =
@@ -73,6 +89,36 @@ async function request<T>(
   } finally {
     window.clearTimeout(timeout);
   }
+}
+
+let refreshPromise: Promise<AuthResponseDto> | null = null;
+
+export function renewAuthSession(): Promise<AuthResponseDto> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    const response = await fetch(buildUrl("/auth/refresh"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await parseResponse(response);
+    if (!response.ok) {
+      const message =
+        isMessageResponse(data) && typeof data.message === "string"
+          ? data.message
+          : "No existe una sesión activa.";
+      throw new ApiError(message, response.status, data);
+    }
+
+    const session = data as AuthResponseDto;
+    useAuthStore.getState().setSession(session);
+    return session;
+  })().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
 }
 
 function buildUrl(path: string, params?: object): string {
@@ -113,3 +159,6 @@ export const httpClient = {
   put: <T>(path: string, body?: unknown, config?: RequestConfig) =>
     request<T>("PUT", path, body, config),
 };
+import type { AuthResponseDto } from "@caninany/shared";
+
+import { useAuthStore } from "@/store/auth.store";
