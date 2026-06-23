@@ -6,13 +6,10 @@ import {
   Ear,
   Heart,
   PawPrint,
-  Phone,
   ShieldCheck,
   Sparkles,
-  Star,
 } from "lucide-react";
 import type { JSX } from "react";
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import { DeferredAppointmentForm } from "@/features/appointments/components/deferred-appointment-form";
@@ -23,21 +20,53 @@ import { GallerySection } from "../components/gallery-section";
 const services = [
   {
     icon: Bath,
+    index: "01",
     name: "Baño completo",
     description:
       "Shampoo suave, masaje, secado paciente y cepillado final según su tamaño.",
     detail: "45 a 90 min",
-    color: "bg-[#dce8db]",
-    iconColor: "text-[#315f49]",
+    image: "/images/dog-bath.webp",
   },
   {
     icon: Ear,
+    index: "02",
     name: "Limpieza de oídos",
     description:
       "Limpieza externa delicada para mantener sus oídos limpios y cómodos.",
     detail: "20 min aprox.",
-    color: "bg-[#f4dfd1]",
-    iconColor: "text-[#a65f40]",
+    image: "/images/ear-care.webp",
+  },
+  {
+    icon: Sparkles,
+    index: "03",
+    name: "Cuidado completo",
+    description:
+      "Baño y limpieza externa de oídos en una sola visita tranquila y coordinada.",
+    detail: "Duración según peso",
+    image: "/images/caninany-hero.webp",
+  },
+];
+
+const trustPoints = [
+  {
+    icon: Clock3,
+    title: "Atención sin apuros",
+    text: "Cada bloque considera el servicio y tamaño de tu mascota.",
+  },
+  {
+    icon: Heart,
+    title: "Trato personalizado",
+    text: "Observamos su carácter y adaptamos el ritmo de la visita.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Ambiente seguro",
+    text: "Espacio limpio, rutinas suaves y acompañamiento constante.",
+  },
+  {
+    icon: Check,
+    title: "Reserva clara",
+    text: "Disponibilidad real y confirmación directa del equipo.",
   },
 ];
 
@@ -62,49 +91,6 @@ const reviews = [
   },
 ];
 
-function BookingSection(): JSX.Element {
-  return (
-    <section
-      id="reservar"
-      className="deferred-section bg-[#d9865f] px-5 py-16 sm:px-8 lg:py-24"
-    >
-      <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-        <div className="rounded-[1.5rem] border border-white/20 bg-[#c97752] p-5 text-white shadow-[0_24px_80px_rgba(94,45,24,0.16)] sm:rounded-[1.75rem] sm:p-8 lg:sticky lg:top-28">
-          <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-[#ffe2d2]">
-            Reserva online
-          </p>
-          <h2 className="mt-4 font-display text-3xl leading-[1.08] sm:text-5xl">
-            Agenda baño, oídos o el cuidado completo.
-          </h2>
-          <p className="mt-4 text-sm leading-6 text-[#fff0e7] sm:text-base sm:leading-7">
-            Elige el servicio, cuéntanos el peso de tu mascota y revisa la
-            agenda disponible. Te contactaremos por WhatsApp para confirmar.
-          </p>
-
-          <div className="mt-6 grid gap-2.5 text-sm font-bold sm:gap-3">
-            {[
-              { icon: Sparkles, text: "Baño + oídos disponible como combo" },
-              { icon: Clock3, text: "Bloques calculados según peso y servicio" },
-              { icon: Phone, text: "Confirmación directa por WhatsApp" },
-            ].map((item) => (
-              <p key={item.text} className="flex items-center gap-3">
-                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/15 sm:size-9">
-                  <item.icon className="size-4" />
-                </span>
-                {item.text}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-[1.75rem] bg-[#fffaf3] p-5 shadow-[0_28px_80px_rgba(94,45,24,0.2)] sm:p-8">
-          <DeferredAppointmentForm />
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function HomePage(): JSX.Element {
   const configuration = useSiteConfiguration();
   const content = configuration.data ?? {
@@ -119,322 +105,413 @@ export function HomePage(): JSX.Element {
       "Una rutina simple, bien hecha y adaptada al tamaño de tu mascota.",
   };
 
-  useEffect(() => {
-    const targetId = window.location.hash.slice(1);
-    if (!targetId) return;
-
-    requestAnimationFrame(() => {
-      document.getElementById(targetId)?.scrollIntoView();
-    });
-  }, []);
-
   return (
     <>
-      <section className="px-4 pb-10 pt-24 sm:px-6 sm:pt-28 lg:pb-14">
-        <div className="relative mx-auto min-h-[640px] max-w-[1500px] overflow-hidden rounded-[1.75rem] bg-[#e9e3d8] sm:min-h-[680px] sm:rounded-[2.5rem]">
-          <img
-            src={content.heroImageUrl}
-            alt="Golden retriever feliz después de su baño"
-            className="absolute inset-0 size-full object-cover object-[72%_center] sm:object-[62%_center]"
-            fetchPriority="high"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#fff8ef]/95 via-[#fff8ef]/82 to-[#fff8ef]/42 sm:bg-gradient-to-r sm:from-[#fff8ef] sm:via-[#fff8ef]/86 sm:to-[#fff8ef]/8" />
-          <div className="absolute -left-16 bottom-[-7rem] hidden size-72 rounded-full border-[42px] border-[#d79570]/18 sm:block" />
+      <HeroSection content={content} />
 
-          <div className="relative z-10 flex min-h-[640px] max-w-3xl flex-col justify-center px-6 py-14 sm:min-h-[680px] sm:px-12 lg:px-20">
-            <div className="mb-7 inline-flex w-fit items-center gap-2 rounded-full border border-[#d9cec0] bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-[#345644] backdrop-blur">
-              <PawPrint className="size-4 text-[#c27650]" />
-              Baño y limpieza de oídos
-            </div>
-            <h1 className="font-display text-4xl leading-[1.03] text-[#183c2d] sm:text-6xl lg:text-[4.9rem]">
-              {content.heroTitle}
-              <span className="block text-[#b96f4b]">
-                {content.heroHighlight}
-              </span>
-            </h1>
-            <p className="mt-7 max-w-xl text-lg leading-8 text-[#52665c] sm:text-xl">
-              {content.heroDescription}
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#reservar"
-                className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-[#214e3b] px-7 text-sm font-extrabold text-white shadow-[0_14px_35px_rgba(33,78,59,0.25)] transition hover:-translate-y-1 hover:bg-[#173c2c]"
-              >
-                Reservar una visita
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-              </a>
-              <a
-                href="#servicios"
-                className="inline-flex h-14 items-center justify-center rounded-full border border-[#bfb6a9] bg-white/70 px-7 text-sm font-extrabold text-[#284a39] backdrop-blur transition hover:bg-white"
-              >
-                Ver servicios
-              </a>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-[#5c6d64]">
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[#b96f4b]" />
-                Atención sin apuros
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[#b96f4b]" />
-                Productos suaves
-              </span>
-              <span className="flex items-center gap-2">
-                <Check className="size-4 text-[#b96f4b]" />
-                Reserva simple
-              </span>
-            </div>
-          </div>
-        </div>
+      <section className="bg-brand-yellow px-5 py-12 text-center sm:px-8 sm:py-16">
+        <p className="mx-auto max-w-5xl font-display text-2xl leading-tight text-brand-deep sm:text-3xl lg:text-[2.55rem]">
+          Nuestro propósito es simple: cuidar con paciencia para que cada
+          mascota viva su visita con más calma, confianza y bienestar.
+        </p>
       </section>
 
-      <section
-        id="servicios"
-        className="deferred-section px-5 py-16 sm:px-8 lg:py-24"
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="eyebrow">{content.servicesEyebrow}</p>
-            <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
-              {content.servicesTitle}
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-[#6b7971]">
-              {content.servicesDescription}
-            </p>
+      <ServicesSection
+        eyebrow={content.servicesEyebrow}
+        title={content.servicesTitle}
+        description={content.servicesDescription}
+      />
+
+      <TrustSection />
+      <ExperienceSection />
+      <AboutTeaser />
+      <GallerySection />
+      <ReviewsSection />
+      <BookingSection />
+    </>
+  );
+}
+
+interface HeroContent {
+  heroDescription: string;
+  heroHighlight: string;
+  heroImageUrl: string;
+  heroTitle: string;
+}
+
+function HeroSection({ content }: { content: HeroContent }): JSX.Element {
+  return (
+    <section className="relative min-h-[670px] overflow-hidden bg-brand-deep text-white lg:min-h-[720px]">
+      <img
+        src={content.heroImageUrl}
+        alt="Golden retriever feliz después de su baño en Caninany"
+        className="absolute inset-0 size-full object-cover object-[68%_center] sm:object-[62%_center] lg:object-center"
+        fetchPriority="high"
+      />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(74,43,77,0.98)_0%,rgba(74,43,77,0.88)_36%,rgba(74,43,77,0.25)_76%,rgba(74,43,77,0.08)_100%)]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-brand-deep/50 via-transparent to-transparent lg:hidden" />
+
+      <div className="site-container relative flex min-h-[670px] items-center py-16 lg:min-h-[720px]">
+        <div className="max-w-3xl">
+          <p className="inline-flex items-center gap-3 text-xs font-extrabold uppercase tracking-[0.18em] text-[#ffe7a3]">
+            <PawPrint className="size-4" />
+            Bienestar e higiene canina
+          </p>
+          <h1 className="display-title mt-7 max-w-3xl">
+            {content.heroTitle}
+            <span className="mt-2 block text-[#ffc63d]">
+              {content.heroHighlight}
+            </span>
+          </h1>
+          <p className="mt-7 max-w-xl text-base leading-8 text-[#eadfed] sm:text-lg">
+            {content.heroDescription}
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <Link
+              to="/agendar"
+              className="group inline-flex min-h-14 items-center justify-center gap-3 bg-brand-bright px-7 text-sm font-extrabold text-white shadow-[0_14px_35px_rgba(0,0,0,0.22)] transition hover:bg-[#b167b6]"
+            >
+              Reservar una hora
+              <ArrowRight className="size-4 transition group-hover:translate-x-1" />
+            </Link>
+            <Link
+              to="/#servicios"
+              className="inline-flex min-h-14 items-center justify-center border border-white/45 bg-white/8 px-7 text-sm font-extrabold text-white backdrop-blur-sm transition hover:bg-white hover:text-brand-deep"
+            >
+              Conocer los servicios
+            </Link>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2">
-            {services.map((service) => (
-              <article
-                key={service.name}
-                className="group rounded-[1.5rem] border border-[#e5ddd2] bg-white p-6 shadow-[0_16px_50px_rgba(47,67,56,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(47,67,56,0.1)] sm:p-7"
-              >
-                <div
-                  className={`grid size-14 place-items-center rounded-2xl ${service.color}`}
+          <div className="mt-10 grid max-w-2xl gap-3 border-t border-white/18 pt-6 text-sm font-bold text-[#eadfed] sm:grid-cols-3">
+            {["Atención sin apuros", "Productos suaves", "Reserva simple"].map(
+              (item) => (
+                <span key={item} className="flex items-center gap-2.5">
+                  <Check className="size-4 shrink-0 text-brand-yellow" />
+                  {item}
+                </span>
+              ),
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ServicesSection({
+  description,
+  eyebrow,
+  title,
+}: {
+  description: string;
+  eyebrow: string;
+  title: string;
+}): JSX.Element {
+  return (
+    <section id="servicios" className="section-pad bg-brand-cream">
+      <div className="site-container">
+        <div className="grid gap-7 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+          <div>
+            <p className="section-kicker">{eyebrow}</p>
+            <h2 className="section-title mt-5 max-w-xl text-brand-deep">
+              {title}
+            </h2>
+          </div>
+          <p className="max-w-xl text-lg leading-8 text-brand-muted lg:justify-self-end">
+            {description} Puedes elegir un servicio puntual o reunir ambos en
+            una sola visita.
+          </p>
+        </div>
+
+        <div className="mt-14 border-y border-[#e4dfe5]">
+          {services.map((service) => (
+            <article
+              key={service.name}
+              className="group grid gap-6 border-b border-[#e4dfe5] py-8 last:border-0 md:grid-cols-[5rem_1fr_15rem] md:items-center lg:grid-cols-[6rem_1fr_18rem] lg:py-10"
+            >
+              <div className="flex items-center gap-4 md:block">
+                <span className="text-xs font-extrabold tracking-[0.16em] text-brand-primary">
+                  {service.index}
+                </span>
+                <span className="mt-3 grid size-12 place-items-center bg-brand-soft text-brand-primary md:size-14">
+                  <service.icon className="size-6" strokeWidth={1.7} />
+                </span>
+              </div>
+              <div>
+                <h3 className="font-display text-3xl text-brand-deep sm:text-4xl">
+                  {service.name}
+                </h3>
+                <p className="mt-3 max-w-2xl leading-7 text-brand-muted">
+                  {service.description}
+                </p>
+                <span className="mt-4 inline-block text-xs font-extrabold uppercase tracking-[0.14em] text-brand-primary">
+                  {service.detail}
+                </span>
+              </div>
+              <div className="relative h-44 overflow-hidden md:h-36">
+                <img
+                  src={service.image}
+                  alt=""
+                  className="size-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <Link
+                  to="/agendar"
+                  className="absolute bottom-0 right-0 grid size-12 place-items-center bg-brand-bright text-white transition group-hover:bg-brand-deep"
+                  aria-label={`Reservar ${service.name}`}
                 >
-                  <service.icon
-                    className={`size-6 ${service.iconColor}`}
-                    strokeWidth={1.8}
-                  />
+                  <ArrowRight className="size-5" />
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustSection(): JSX.Element {
+  return (
+    <section
+      className="deferred-section bg-white py-14 lg:py-18"
+      aria-labelledby="confianza-title"
+    >
+      <div className="site-container">
+        <div className="flex flex-col gap-4 border-b border-[#e4dfe5] pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <h2
+            id="confianza-title"
+            className="font-display text-3xl text-brand-deep sm:text-4xl"
+          >
+            Por qué confiar en Caninany
+          </h2>
+          <p className="text-sm text-brand-muted">
+            Una atención simple, clara y respetuosa.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4">
+          {trustPoints.map((item) => (
+            <article
+              key={item.title}
+              className="border-b border-[#e4dfe5] px-0 py-8 md:px-7 md:first:pl-0 lg:border-b-0 lg:border-r lg:last:border-r-0"
+            >
+              <item.icon
+                className="size-7 text-brand-primary"
+                strokeWidth={1.6}
+              />
+              <h3 className="mt-5 text-sm font-extrabold uppercase tracking-[0.05em] text-brand-deep">
+                {item.title}
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-brand-muted">
+                {item.text}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ExperienceSection(): JSX.Element {
+  return (
+    <section
+      id="experiencia"
+      className="deferred-section section-pad bg-brand-soft"
+    >
+      <div className="site-container grid items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:gap-20">
+        <div className="relative">
+          <div className="image-reveal aspect-[4/5] overflow-hidden sm:aspect-[6/5] lg:aspect-[4/5]">
+            <img
+              src="/images/dog-bath.webp"
+              alt="Perrito disfrutando un baño cuidadoso"
+              className="size-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div className="absolute -bottom-6 right-0 w-[min(78%,22rem)] bg-brand-bright p-6 text-white shadow-xl sm:p-8 lg:-right-8">
+            <Heart className="size-7" strokeWidth={1.7} />
+            <p className="mt-4 font-display text-2xl leading-tight sm:text-3xl">
+              Cada mascota marca el ritmo.
+            </p>
+          </div>
+        </div>
+
+        <div className="pt-8 lg:pt-0">
+          <p className="section-kicker">Una experiencia diferente</p>
+          <h2 className="section-title mt-5 text-brand-deep">
+            Menos estrés. Más confianza.
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-[#6b646d]">
+            Observamos, escuchamos y adaptamos cada visita. No trabajamos en
+            serie: dedicamos el tiempo necesario para que el cuidado sea una
+            experiencia positiva.
+          </p>
+          <div className="mt-9 border-t border-brand-primary/18">
+            {[
+              ["Tiempo dedicado", "Bloques según el servicio y su tamaño."],
+              [
+                "Ambiente seguro",
+                "Rutinas suaves, espacio limpio y acompañamiento.",
+              ],
+              [
+                "Trato personalizado",
+                "Consideramos su edad, carácter y experiencias.",
+              ],
+            ].map(([title, text], index) => (
+              <div
+                key={title}
+                className="grid grid-cols-[2.5rem_1fr] gap-4 border-b border-brand-primary/18 py-5"
+              >
+                <span className="font-display text-lg text-brand-primary">
+                  0{index + 1}
+                </span>
+                <div>
+                  <h3 className="font-extrabold text-brand-deep">{title}</h3>
+                  <p className="mt-1 leading-6 text-[#6b646d]">{text}</p>
                 </div>
-                <div className="mt-7 flex items-start justify-between gap-5">
-                  <div>
-                    <h3 className="font-display text-2xl text-[#183c2d]">
-                      {service.name}
-                    </h3>
-                    <p className="mt-4 leading-7 text-[#6d7b73]">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-7 flex items-center justify-between border-t border-[#eee7de] pt-5">
-                  <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#b16d4b]">
-                    {service.detail}
-                  </span>
-                  <a
-                    href="#reservar"
-                    className="grid size-11 place-items-center rounded-full bg-[#f2eee7] text-[#214e3b] transition group-hover:bg-[#214e3b] group-hover:text-white"
-                    aria-label={`Reservar ${service.name}`}
-                  >
-                    <ArrowRight className="size-4" />
-                  </a>
-                </div>
-              </article>
+              </div>
             ))}
           </div>
-
-          <div className="mx-auto mt-5 flex max-w-5xl flex-col gap-4 rounded-[1.5rem] border border-[#ead8cc] bg-[#fff6f0] p-5 text-[#244435] sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <div className="flex gap-4">
-              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[#f1ddcf] text-[#b16d4b]">
-                <Sparkles className="size-5" />
-              </span>
-              <div>
-                <p className="font-display text-xl leading-tight">
-                  También puedes reservar el cuidado completo.
-                </p>
-                <p className="mt-1 text-sm leading-6 text-[#66766e]">
-                  Baño + limpieza de oídos en una sola visita tranquila.
-                </p>
-              </div>
-            </div>
-            <a
-              href="#reservar"
-              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[#214e3b] px-5 text-sm font-extrabold text-white"
-            >
-              Reservar combo
-              <ArrowRight className="size-4" />
-            </a>
-          </div>
+          <Link
+            to="/agendar"
+            className="mt-9 inline-flex items-center gap-3 font-extrabold text-brand-primary"
+          >
+            Conversemos sobre tu mascota
+            <ArrowRight className="size-4" />
+          </Link>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <BookingSection />
+function AboutTeaser(): JSX.Element {
+  return (
+    <section className="deferred-section section-pad bg-brand-cream">
+      <div className="site-container grid overflow-hidden bg-brand-deep text-white lg:grid-cols-2">
+        <div className="order-2 p-8 sm:p-12 lg:order-1 lg:p-16">
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-yellow">
+            Nosotros
+          </p>
+          <h2 className="section-title mt-5 max-w-xl text-white">
+            Personas que entienden que el cuidado empieza por la confianza.
+          </h2>
+          <p className="mt-6 max-w-xl leading-8 text-[#ded2e0]">
+            Caninany nace para ofrecer una experiencia de higiene más tranquila,
+            transparente y atenta a las señales de cada perro.
+          </p>
+          <Link
+            to="/nosotros"
+            className="mt-9 inline-flex min-h-12 items-center gap-3 border border-white/40 px-6 text-sm font-extrabold transition hover:bg-white hover:text-brand-deep"
+          >
+            Conocer nuestra forma de trabajar
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+        <div className="image-reveal order-1 min-h-80 lg:order-2">
+          <img
+            src="/images/happy-clients.webp"
+            alt="Una clienta junto a sus perros después de su visita"
+            className="size-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
 
-      <section
-        id="experiencia"
-        className="deferred-section bg-[#eef2e8] px-5 py-16 sm:px-8 lg:py-24"
-      >
-        <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
-          <div className="relative">
-            <div className="image-reveal aspect-[4/5] overflow-hidden rounded-[2.5rem] sm:aspect-[5/4] lg:aspect-[4/5]">
-              <img
-                src="/images/dog-bath.webp"
-                alt="Perrito disfrutando un baño cuidadoso"
-                className="size-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            <div className="absolute -bottom-7 -right-3 max-w-[230px] rounded-[1.8rem] bg-[#d7865e] p-6 text-white shadow-xl sm:right-8">
-              <Heart className="size-7 fill-white/15" />
-              <p className="mt-4 font-display text-2xl leading-tight">
-                Cada mascota marca el ritmo.
-              </p>
-            </div>
-          </div>
-
-          <div className="lg:pl-10">
-            <p className="eyebrow">Una experiencia diferente</p>
-            <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
-              Menos estrés. Más confianza.
+function ReviewsSection(): JSX.Element {
+  return (
+    <section id="opiniones" className="deferred-section section-pad bg-white">
+      <div className="site-container">
+        <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+          <div>
+            <p className="section-kicker">Experiencias compartidas</p>
+            <h2 className="section-title mt-5 text-brand-deep">
+              Buenas visitas dejan huella.
             </h2>
-            <p className="mt-6 text-lg leading-8 text-[#64746b]">
-              Observamos, escuchamos y adaptamos cada visita. No trabajamos en
-              serie: trabajamos con paciencia para que el cuidado sea una
-              experiencia positiva.
-            </p>
+          </div>
+          <p className="max-w-xl text-lg leading-8 text-brand-muted lg:justify-self-end">
+            Relatos de familias que valoran una atención cercana, paciente y
+            fácil de coordinar.
+          </p>
+        </div>
 
-            <div className="mt-9 grid gap-6">
-              {[
-                {
-                  icon: Clock3,
-                  title: "Tiempo dedicado",
-                  text: "Bloques de atención según el servicio y su tamaño.",
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Ambiente seguro",
-                  text: "Rutinas suaves, espacio limpio y acompañamiento constante.",
-                },
-                {
-                  icon: Heart,
-                  title: "Trato personalizado",
-                  text: "Consideramos su edad, carácter y experiencias anteriores.",
-                },
-              ].map((item) => (
-                <div key={item.title} className="flex gap-4">
-                  <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-white text-[#b96f4b] shadow-sm">
-                    <item.icon className="size-5" />
-                  </span>
-                  <div>
-                    <h3 className="font-bold text-[#28473a]">{item.title}</h3>
-                    <p className="mt-1 leading-6 text-[#6c7b73]">{item.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href="#reservar"
-              className="mt-10 inline-flex items-center gap-3 font-extrabold text-[#214e3b]"
+        <div className="mt-12 grid border-y border-[#e4dfe5] lg:grid-cols-3">
+          {reviews.map((review, index) => (
+            <article
+              key={review.name}
+              className="border-b border-[#e4dfe5] px-0 py-9 lg:border-b-0 lg:border-r lg:px-9 lg:first:pl-0 lg:last:border-r-0"
             >
-              Conversemos sobre tu mascota
-              <ArrowRight className="size-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <GallerySection />
-
-      <section
-        id="opiniones"
-        className="deferred-section px-5 py-16 sm:px-8 lg:py-24"
-      >
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr]">
-            <div>
-              <p className="eyebrow">Lo dicen sus humanos</p>
-              <h2 className="mt-5 font-display text-4xl leading-[1.06] text-[#183c2d] sm:text-5xl">
-                Buenas experiencias dejan huella.
-              </h2>
-              <div className="mt-7 flex items-center gap-4">
-                <div className="flex text-[#d47c4e]">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star key={index} className="size-5 fill-current" />
-                  ))}
-                </div>
-                <span className="font-bold text-[#40574c]">4.9 de 5</span>
-              </div>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-2">
-              {reviews.map((review, index) => (
-                <article
-                  key={review.name}
-                  className={`rounded-[2rem] p-7 sm:p-8 ${
-                    index === 0
-                      ? "bg-[#f1e3d8] md:col-span-2"
-                      : "border border-[#e7ded2] bg-white"
-                  }`}
+              <span className="font-display text-5xl leading-none text-brand-yellow">
+                “
+              </span>
+              <blockquote className="mt-3 font-display text-xl leading-snug text-brand-deep sm:text-2xl">
+                {review.quote}
+              </blockquote>
+              <div className="mt-7 flex items-center gap-3">
+                <span
+                  className={`grid size-10 place-items-center ${index === 1 ? "bg-brand-bright" : "bg-brand-primary"} text-white`}
                 >
-                  <div className="flex text-[#d47c4e]">
-                    {Array.from({ length: 5 }).map((_, star) => (
-                      <Star key={star} className="size-4 fill-current" />
-                    ))}
-                  </div>
-                  <blockquote
-                    className={`mt-6 font-display leading-tight text-[#244435] ${
-                      index === 0 ? "text-2xl sm:text-3xl" : "text-xl"
-                    }`}
-                  >
-                    “{review.quote}”
-                  </blockquote>
-                  <div className="mt-7 flex items-center gap-3">
-                    <span className="grid size-11 place-items-center rounded-full bg-[#214e3b] text-white">
-                      <PawPrint className="size-5" />
-                    </span>
-                    <div>
-                      <p className="font-bold text-[#29483a]">{review.name}</p>
-                      <p className="text-sm text-[#75827b]">{review.pet}</p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
+                  <PawPrint className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-extrabold text-brand-deep">
+                    {review.name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-brand-muted">
+                    {review.pet}
+                  </p>
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <footer className="bg-[#122e22] px-5 py-14 text-white sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-10 border-b border-white/10 pb-10 md:flex-row md:items-center md:justify-between">
-            <Link to="/" className="flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-2xl bg-[#d9865f]">
-                <PawPrint className="size-5" />
-              </span>
-              <span>
-                <span className="block font-display text-3xl leading-none">
-                  Caninany
+function BookingSection(): JSX.Element {
+  return (
+    <section
+      id="reservar"
+      className="deferred-section section-pad bg-brand-bright"
+    >
+      <div className="site-container grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-start">
+        <div className="text-white lg:sticky lg:top-40">
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#f4eaf5]">
+            Reserva online
+          </p>
+          <h2 className="section-title mt-5 text-white">
+            Agenda el cuidado que necesita.
+          </h2>
+          <p className="mt-6 max-w-xl leading-8 text-[#f7eff8]">
+            Elige el servicio, cuéntanos el peso de tu mascota y revisa la
+            disponibilidad real. El equipo te contactará para confirmar.
+          </p>
+          <div className="mt-8 grid gap-3 border-t border-white/25 pt-6 text-sm font-bold">
+            {[
+              "Baño y oídos disponibles por separado",
+              "Duración calculada según peso",
+              "Solicitud protegida contra dobles reservas",
+            ].map((item) => (
+              <p key={item} className="flex items-center gap-3">
+                <span className="grid size-7 place-items-center bg-white/15">
+                  <Check className="size-4" />
                 </span>
-                <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.24em] text-[#9db2a7]">
-                  Baño y oídos
-                </span>
-              </span>
-            </Link>
-            <div className="flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-[#b8c8bf]">
-              <a href="#servicios">Servicios</a>
-              <a href="#experiencia">Experiencia</a>
-              <a href="#galeria">Galería</a>
-              <a href="#reservar">Reservar</a>
-              <Link to="/ingresar">Acceso usuarios</Link>
-            </div>
-          </div>
-          <div className="flex flex-col gap-3 pt-7 text-xs text-[#82988d] sm:flex-row sm:justify-between">
-            <p>© 2026 Caninany. Cuidado hecho con paciencia.</p>
-            <p>Baño · Limpieza de oídos · Bienestar</p>
+                {item}
+              </p>
+            ))}
           </div>
         </div>
-      </footer>
-    </>
+
+        <div className="bg-brand-cream p-5 shadow-[0_30px_80px_rgba(116,71,118,0.2)] sm:p-8 lg:p-10">
+          <DeferredAppointmentForm />
+        </div>
+      </div>
+    </section>
   );
 }
