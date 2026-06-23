@@ -1,9 +1,17 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { APP_FILTER } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
+import {
+  ACTION_TOKEN_CODEC,
+  type ActionTokenCodec,
+} from "./application/ports/action-token.port";
+import {
+  AUTH_NOTIFICATION,
+  type AuthNotification,
+} from "./application/ports/auth-notification.port";
 import {
   BUSINESS_CALENDAR,
   type BusinessCalendar,
@@ -11,9 +19,25 @@ import {
 import { CLOCK } from "./application/ports/clock.port";
 import { ID_GENERATOR } from "./application/ports/id-generator.port";
 import {
+  GOOGLE_IDENTITY,
+  type GoogleIdentityVerifier,
+} from "./application/ports/google-identity.port";
+import {
   PASSWORD_HASHER,
   type PasswordHasher,
 } from "./application/ports/password-hasher.port";
+import {
+  REFRESH_TOKEN_CODEC,
+  type RefreshTokenCodec,
+} from "./application/ports/refresh-token.port";
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepository,
+} from "./domain/repositories/auth-session.repository";
+import {
+  AUTH_TOKEN_REPOSITORY,
+  type AuthTokenRepository,
+} from "./domain/repositories/auth-token.repository";
 import {
   TOKEN_ISSUER,
   type TokenIssuer,
@@ -49,6 +73,9 @@ import {
   type UserRepository,
 } from "./domain/repositories/user.repository";
 import { AdminBootstrapService } from "./infrastructure/auth/admin-bootstrap.service";
+import { CryptoActionTokenCodec } from "./infrastructure/auth/crypto-action-token.codec";
+import { CryptoRefreshTokenCodec } from "./infrastructure/auth/crypto-refresh-token.codec";
+import { GoogleIdentityVerifierService } from "./infrastructure/auth/google-identity.verifier";
 import { JwtStrategy } from "./infrastructure/auth/jwt.strategy";
 import { JwtTokenIssuer } from "./infrastructure/auth/jwt-token-issuer";
 import { RolesGuard } from "./infrastructure/auth/roles.guard";
@@ -56,6 +83,8 @@ import { ScryptPasswordHasher } from "./infrastructure/auth/scrypt-password-hash
 import { validateEnvironment } from "./infrastructure/config/environment";
 import { PrismaService } from "./infrastructure/database/prisma/prisma.service";
 import { PrismaAppointmentRepository } from "./infrastructure/database/prisma/repositories/prisma-appointment.repository";
+import { PrismaAuthSessionRepository } from "./infrastructure/database/prisma/repositories/prisma-auth-session.repository";
+import { PrismaAuthTokenRepository } from "./infrastructure/database/prisma/repositories/prisma-auth-token.repository";
 import { PrismaPurchaseRepository } from "./infrastructure/database/prisma/repositories/prisma-purchase.repository";
 import { PrismaPetRepository } from "./infrastructure/database/prisma/repositories/prisma-pet.repository";
 import { PrismaSiteConfigurationRepository } from "./infrastructure/database/prisma/repositories/prisma-site-configuration.repository";
@@ -68,10 +97,12 @@ import { PurchasesController } from "./infrastructure/http/controllers/purchases
 import { PetsController } from "./infrastructure/http/controllers/pets.controller";
 import { SiteConfigurationController } from "./infrastructure/http/controllers/site-configuration.controller";
 import { UsersController } from "./infrastructure/http/controllers/users.controller";
+import { RateLimitGuard } from "./infrastructure/http/rate-limit.guard";
 import { CryptoIdGenerator } from "./infrastructure/ids/crypto-id-generator";
 import { LocalImageStorage } from "./infrastructure/storage/local-image-storage";
 import { IntlBusinessCalendar } from "./infrastructure/time/intl-business-calendar";
 import { SystemClock } from "./infrastructure/time/system-clock";
+import { AuthNotificationService } from "./infrastructure/mail/auth-notification.service";
 
 @Module({
   imports: [
@@ -85,7 +116,7 @@ import { SystemClock } from "./infrastructure/time/system-clock";
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>("JWT_SECRET"),
-        signOptions: { expiresIn: "2h" },
+        signOptions: { expiresIn: "10m" },
       }),
     }),
   ],
@@ -100,12 +131,17 @@ import { SystemClock } from "./infrastructure/time/system-clock";
   ],
   providers: [
     PrismaService,
+    PrismaAuthSessionRepository,
+    PrismaAuthTokenRepository,
     PrismaAppointmentRepository,
     PrismaPetRepository,
     PrismaPurchaseRepository,
     PrismaSiteConfigurationRepository,
     PrismaUserRepository,
     CryptoIdGenerator,
+    CryptoActionTokenCodec,
+    CryptoRefreshTokenCodec,
+    GoogleIdentityVerifierService,
     IntlBusinessCalendar,
     JwtTokenIssuer,
     LocalImageStorage,
@@ -114,9 +150,35 @@ import { SystemClock } from "./infrastructure/time/system-clock";
     JwtStrategy,
     RolesGuard,
     AdminBootstrapService,
+    AuthNotificationService,
+    RateLimitGuard,
+    {
+      provide: GOOGLE_IDENTITY,
+      useExisting: GoogleIdentityVerifierService,
+    },
+    {
+      provide: ACTION_TOKEN_CODEC,
+      useExisting: CryptoActionTokenCodec,
+    },
+    {
+      provide: AUTH_NOTIFICATION,
+      useExisting: AuthNotificationService,
+    },
+    {
+      provide: AUTH_SESSION_REPOSITORY,
+      useExisting: PrismaAuthSessionRepository,
+    },
+    {
+      provide: AUTH_TOKEN_REPOSITORY,
+      useExisting: PrismaAuthTokenRepository,
+    },
     {
       provide: APPOINTMENT_REPOSITORY,
       useExisting: PrismaAppointmentRepository,
+    },
+    {
+      provide: REFRESH_TOKEN_CODEC,
+      useExisting: CryptoRefreshTokenCodec,
     },
     {
       provide: PET_REPOSITORY,
@@ -198,17 +260,54 @@ import { SystemClock } from "./infrastructure/time/system-clock";
     },
     {
       provide: AuthApplicationService,
-      inject: [USER_REPOSITORY, PASSWORD_HASHER, TOKEN_ISSUER],
+      inject: [
+        USER_REPOSITORY,
+        PASSWORD_HASHER,
+        TOKEN_ISSUER,
+        AUTH_SESSION_REPOSITORY,
+        REFRESH_TOKEN_CODEC,
+        ID_GENERATOR,
+        CLOCK,
+        AUTH_TOKEN_REPOSITORY,
+        ACTION_TOKEN_CODEC,
+        AUTH_NOTIFICATION,
+        GOOGLE_IDENTITY,
+      ],
       useFactory: (
         users: UserRepository,
         passwords: PasswordHasher,
         tokens: TokenIssuer,
-      ) => new AuthApplicationService(users, passwords, tokens),
+        sessions: AuthSessionRepository,
+        refreshTokens: RefreshTokenCodec,
+        ids: CryptoIdGenerator,
+        clock: SystemClock,
+        authTokens: AuthTokenRepository,
+        actionTokens: ActionTokenCodec,
+        notifications: AuthNotification,
+        googleIdentity: GoogleIdentityVerifier,
+      ) =>
+        new AuthApplicationService(
+          users,
+          passwords,
+          tokens,
+          sessions,
+          refreshTokens,
+          ids,
+          clock,
+          authTokens,
+          actionTokens,
+          notifications,
+          googleIdentity,
+        ),
     },
     {
       provide: AdminUsersService,
-      inject: [USER_REPOSITORY],
-      useFactory: (users: UserRepository) => new AdminUsersService(users),
+      inject: [USER_REPOSITORY, AUTH_SESSION_REPOSITORY, CLOCK],
+      useFactory: (
+        users: UserRepository,
+        sessions: AuthSessionRepository,
+        clock: SystemClock,
+      ) => new AdminUsersService(users, sessions, clock),
     },
     {
       provide: PetsService,
@@ -227,6 +326,10 @@ import { SystemClock } from "./infrastructure/time/system-clock";
       inject: [SITE_CONFIGURATION_REPOSITORY],
       useFactory: (configuration: SiteConfigurationRepository) =>
         new SiteConfigurationService(configuration),
+    },
+    {
+      provide: APP_GUARD,
+      useExisting: RateLimitGuard,
     },
     {
       provide: APP_FILTER,
