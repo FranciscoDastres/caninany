@@ -256,6 +256,10 @@ público siempre crea usuarios con rol `cliente`.
 
 Rutas React:
 
+- `/`: portada comercial con servicios, experiencia, galería, opiniones y
+  acceso a reserva.
+- `/nosotros`: propósito y forma de trabajo de Caninany.
+- `/agendar`: agenda pública y solicitud de hora.
 - `/ingresar` y `/registro`.
 - `/perfil`: panel protegido para clientes.
 - `/admin`: gestión de usuarios y contenido, protegida para administradores.
