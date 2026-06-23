@@ -44,6 +44,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-before-production}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:3000/api/v1}
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-http://localhost:5173}
+      MAIL_MODE: ${MAIL_MODE:-log}
+      MAIL_FROM: ${MAIL_FROM:-Caninany <no-reply@caninany.cl>}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       UPLOADS_DIR: /workspace/uploads
       ADMIN_NAME: ${ADMIN_NAME:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
@@ -92,6 +97,7 @@ services:
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
       VITE_WHATSAPP_NUMBER: ${VITE_WHATSAPP_NUMBER:-}
+      VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
       CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
