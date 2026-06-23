@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "@/store/auth.store";
+import { logout } from "@/features/auth/api/auth.api";
 
 const primaryLinks = [
   { label: "Servicios", to: "/#servicios" },
@@ -45,15 +46,19 @@ export function AppShell({ children }: PropsWithChildren): JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const clearSession = useAuthStore((state) => state.clearSession);
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER?.replace(
     /\D/g,
     "",
   );
 
   const closeMenu = (): void => setMenuOpen(false);
-  const logoutAndReturnHome = (): void => {
-    logout();
+  const logoutAndReturnHome = async (): Promise<void> => {
+    try {
+      await logout();
+    } finally {
+      clearSession();
+    }
     closeMenu();
     navigate("/");
   };
