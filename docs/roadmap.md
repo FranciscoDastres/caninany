@@ -1,6 +1,10 @@
 # Roadmap de producto y mejora técnica
 
-Estado de referencia: 14 de junio de 2026.
+Estado de referencia: 23 de junio de 2026.
+
+El orden vigente para identidad e intranets está detallado en
+[plan-identidad-intranets.md](plan-identidad-intranets.md) y reemplaza el orden
+histórico de ejecución de este documento.
 
 Este plan se basa en una revisión del frontend, backend, modelo de datos,
 pruebas, contenedores y flujos visibles. El objetivo no es sumar pantallas
@@ -29,8 +33,8 @@ aisladas, sino completar primero el ciclo operativo de una reserva.
   asociarlas a una cita.
 - Los estados de una cita existen en la base de datos, pero no hay endpoints ni
   interfaz para confirmarla, completarla o cancelarla.
-- El login entrega un access token de dos horas, sin refresh token, revocación
-  ni cierre de sesión en servidor.
+- La base de identidad ya incluye sesiones, verificación, recuperación, rate
+  limiting y Google. Falta conectarla a “Cuenta y seguridad” del portal.
 - El contenido editable cubre solo una parte de la portada.
 
 ## Riesgos que bloquean la operación real
@@ -43,8 +47,8 @@ aisladas, sino completar primero el ciclo operativo de una reserva.
    horizonte máximo ni expiración de solicitudes pendientes.
 4. El sitio anuncia atención de lunes a sábado, mientras el calendario backend
    abre todos los días, incluidos domingos.
-5. Cambiar el rol de un usuario no invalida su JWT actual; un administrador
-   degradado conserva permisos hasta que expire el token.
+5. La suspensión de usuarios y la protección del último administrador aún no
+   están cerradas en la interfaz administrativa.
 6. No existen pruebas de frontend, pruebas e2e ni pruebas de repositorios
    contra PostgreSQL real.
 
@@ -145,15 +149,16 @@ trabajo sin tocar la base de datos, Swagger ni variables de entorno.
 
 Objetivo: proteger cuentas, datos personales y operaciones administrativas.
 
-- Implementar refresh tokens rotatorios con almacenamiento `HttpOnly`,
-  `Secure` y `SameSite`.
-- Mantener access tokens de corta duración fuera de `localStorage`.
-- Crear logout de servidor y revocación por dispositivo o sesión.
-- Invalidar sesiones cuando cambie el rol, contraseña o estado de la cuenta.
-- Consultar el usuario actual o usar una versión de sesión para operaciones
-  sensibles.
-- Implementar recuperación y cambio de contraseña.
-- Añadir verificación de correo y protección contra enumeración de cuentas.
+- [x] Implementar refresh tokens rotatorios con almacenamiento `HttpOnly`,
+      `Secure` y `SameSite`.
+- [x] Mantener access tokens de corta duración fuera de `localStorage`.
+- [x] Crear logout de servidor y revocación por dispositivo o sesión.
+- [x] Invalidar sesiones cuando cambie la contraseña. El cambio de rol también
+      las invalida; falta exponer la suspensión administrativa.
+- [x] Consultar el usuario actual y la sesión para operaciones
+      sensibles.
+- [x] Implementar recuperación y cambio de contraseña.
+- [x] Añadir verificación de correo y protección contra enumeración de cuentas.
 - Normalizar correos en una sola capa y aplicar unicidad sin distinguir
   mayúsculas.
 - Revisar política de contraseña. `scrypt` es adecuado si sus parámetros se
