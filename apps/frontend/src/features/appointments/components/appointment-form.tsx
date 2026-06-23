@@ -107,16 +107,19 @@ export function AppointmentForm(): JSX.Element {
 
   if (createdRequest) {
     return (
-      <div className="grid min-h-[480px] place-items-center text-center">
+      <div
+        className="grid min-h-[480px] place-items-center text-center"
+        role="status"
+      >
         <div className="max-w-md">
-          <span className="mx-auto grid size-20 place-items-center rounded-full bg-[#dce8db] text-[#2c654b]">
+          <span className="mx-auto grid size-20 place-items-center bg-brand-soft text-brand-primary">
             <CheckCircle2 className="size-9" />
           </span>
           <p className="eyebrow mt-7">Solicitud registrada</p>
-          <h3 className="mt-3 font-display text-4xl leading-tight text-[#183c2d]">
+          <h3 className="mt-3 font-display text-4xl leading-tight text-[#744776]">
             El bloque quedó reservado para revisión.
           </h3>
-          <p className="mt-4 leading-7 text-[#6d7b73]">
+          <p className="mt-4 leading-7 text-[#756e77]">
             Guardamos tu solicitud para el{" "}
             <strong>
               {formatRequestDateTime(
@@ -128,7 +131,7 @@ export function AppointmentForm(): JSX.Element {
           </p>
           <button
             type="button"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full border border-[#cfc5b8] px-6 text-sm font-extrabold text-[#214e3b] transition hover:bg-white"
+            className="mt-8 inline-flex h-12 items-center justify-center border border-[#cfc5d1] px-6 text-sm font-extrabold text-brand-primary transition hover:bg-white"
             onClick={() => setCreatedRequest(null)}
           >
             Solicitar otra hora
@@ -174,7 +177,7 @@ export function AppointmentForm(): JSX.Element {
 
       <div>
         <p className="eyebrow">Agenda disponible</p>
-        <p className="mt-2 text-sm leading-6 text-[#75827b]">
+        <p className="mt-2 text-sm leading-6 text-[#756e77]">
           Elige un bloque compatible con el peso y servicio de tu mascota.
         </p>
         <div className="mt-4">
@@ -243,7 +246,10 @@ export function AppointmentForm(): JSX.Element {
       </FormField>
 
       {serverError ? (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <p
+          role="alert"
+          className="bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+        >
           {serverError}
         </p>
       ) : null}
@@ -251,14 +257,14 @@ export function AppointmentForm(): JSX.Element {
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-[#214e3b] px-8 text-sm font-extrabold text-white shadow-[0_14px_35px_rgba(33,78,59,0.2)] transition hover:-translate-y-0.5 hover:bg-[#173c2c] disabled:pointer-events-none disabled:opacity-60"
+        className="group inline-flex h-14 items-center justify-center gap-3 bg-brand-primary px-8 text-sm font-extrabold text-white shadow-[0_14px_35px_rgba(143,98,145,0.2)] transition hover:bg-brand-deep disabled:pointer-events-none disabled:opacity-60"
       >
         {mutation.isPending
           ? "Registrando solicitud..."
           : "Solicitar esta hora"}
         <Send className="size-4 transition-transform group-hover:translate-x-1" />
       </button>
-      <p className="text-center text-xs leading-5 text-[#7b8780]">
+      <p className="text-center text-xs leading-5 text-[#756e77]">
         La solicitud bloquea el horario para evitar dobles reservas. La atención
         queda confirmada cuando nuestro equipo te contacta.
       </p>
@@ -280,7 +286,7 @@ function ServiceSelector({
   return (
     <div>
       <p className="eyebrow">Elige su cuidado</p>
-      <h3 className="mt-2 font-display text-2xl text-[#183c2d]">
+      <h3 className="mt-2 font-display text-2xl text-[#744776]">
         ¿Qué necesita esta vez?
       </h3>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -290,10 +296,10 @@ function ServiceSelector({
           return (
             <label
               key={option.value}
-              className={`relative cursor-pointer rounded-[1.15rem] border p-4 transition ${
+              className={`relative cursor-pointer rounded-[0.7rem] border p-4 transition ${
                 selected
-                  ? "border-[#214e3b] bg-[#e8efe8] shadow-sm"
-                  : "border-[#dfd7cc] bg-white hover:border-[#9eb1a5]"
+                  ? "border-[#8f6291] bg-[#f0e8f1] shadow-sm"
+                  : "border-[#dfd7e0] bg-white hover:border-[#b99fbc]"
               }`}
             >
               <input
@@ -303,22 +309,22 @@ function ServiceSelector({
                 {...register("service")}
               />
               <option.icon
-                className={`size-6 ${selected ? "text-[#214e3b]" : "text-[#b16d4b]"}`}
+                className={`size-6 ${selected ? "text-[#8f6291]" : "text-[#8f6291]"}`}
                 strokeWidth={1.8}
               />
               {option.badge ? (
-                <span className="absolute right-3 top-3 rounded-full bg-[#214e3b] px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-white">
+                <span className="absolute right-3 top-3 bg-brand-primary px-2 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-white">
                   {option.badge}
                 </span>
               ) : null}
-              <span className="mt-3 block font-extrabold text-[#2b483a]">
+              <span className="mt-3 block font-extrabold text-[#403441]">
                 {option.label}
               </span>
-              <span className="mt-1 block text-xs leading-5 text-[#75827b]">
+              <span className="mt-1 block text-xs leading-5 text-[#756e77]">
                 {option.description}
               </span>
               {selected && !option.badge ? (
-                <CheckCircle2 className="absolute right-3 top-3 size-4 text-[#214e3b]" />
+                <CheckCircle2 className="absolute right-3 top-3 size-4 text-[#8f6291]" />
               ) : null}
             </label>
           );
