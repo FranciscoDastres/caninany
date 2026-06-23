@@ -29,6 +29,7 @@ describe("RolesGuard", () => {
           email: "cliente@caninany.cl",
           name: "Cliente",
           role: "cliente",
+          sessionId: "session-id",
         }),
       ),
     ).toBe(false);
@@ -42,6 +43,7 @@ describe("RolesGuard", () => {
           email: "admin@caninany.cl",
           name: "Administración",
           role: "admin",
+          sessionId: "session-id",
         }),
       ),
     ).toBe(true);
