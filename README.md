@@ -4,7 +4,9 @@ Monorepo full-stack para agendar servicios veterinarios de baño y limpieza de
 oídos. La base usa React, Vite, Tailwind CSS, Shadcn, NestJS, Prisma,
 PostgreSQL, pnpm workspaces, Turborepo y Docker.
 
-El avance funcional está organizado en [docs/roadmap.md](docs/roadmap.md).
+El plan vigente de identidad y portales está en
+[docs/plan-identidad-intranets.md](docs/plan-identidad-intranets.md). El
+roadmap general se conserva en [docs/roadmap.md](docs/roadmap.md).
 
 ## Estructura
 
@@ -146,9 +148,12 @@ caninany/
   el repositorio para hot reload.
 - El formulario y el controlador consumen el mismo esquema Zod, evitando
   divergencia entre validación de cliente y servidor.
-- Los JWT incluyen `userId`, correo, nombre y rol (`cliente` o `admin`). El
-  frontend usa `PrivateRoute` para navegación, pero la autorización efectiva
-  siempre se ejecuta en NestJS mediante `JwtAuthGuard` y `RolesGuard`.
+- Los access tokens duran 10 minutos y solo viven en memoria. Cada token está
+  ligado a una sesión activa en PostgreSQL; el backend vuelve a comprobar
+  usuario, estado, rol y sesión en cada request protegido.
+- Los refresh tokens duran 30 días, rotan en cada uso y se almacenan hasheados.
+  El navegador los recibe en una cookie `HttpOnly`, `SameSite=Lax` y `Secure`
+  en producción. La reutilización revoca la sesión afectada.
 - Las contraseñas se almacenan con `scrypt` y salt aleatorio. Nunca se
   persisten ni se registran en texto plano.
 - Las imágenes editables se guardan en un volumen persistente y PostgreSQL
@@ -238,9 +243,20 @@ público siempre crea usuarios con rol `cliente`.
 
 ### Rutas de autenticación y RBAC
 
-- `POST /api/v1/auth/register`: registro de clientes.
-- `POST /api/v1/auth/login`: entrega JWT y usuario autenticado.
+- `POST /api/v1/auth/register`: crea un cliente pendiente de verificación.
+- `POST /api/v1/auth/verify-email` y `/resend-verification`: verificación de
+  correo con tokens hasheados de un solo uso.
+- `POST /api/v1/auth/login`: crea una sesión y entrega access token.
+- `POST /api/v1/auth/refresh`: rota la cookie y renueva el access token.
+- `POST /api/v1/auth/forgot-password` y `/reset-password`: recuperación con
+  vencimiento de 30 minutos y revocación de sesiones.
+- `POST /api/v1/auth/google`: inicio o creación de cuenta cliente con Google.
+- `POST /api/v1/auth/google/link`: vinculación de una cuenta local mediante su
+  contraseña; `DELETE /auth/google` desvincula sin eliminar el último método.
+- `POST /api/v1/auth/logout` y `/logout-all`: cierre actual o general.
 - `GET /api/v1/auth/me`: perfil asociado al token.
+- `GET /api/v1/auth/sessions`: sesiones activas.
+- `DELETE /api/v1/auth/sessions/:id`: revoca una sesión propia.
 - `GET /api/v1/pets`: mascotas activas del cliente autenticado.
 - `POST /api/v1/pets`: crea una mascota para el cliente autenticado.
 - `PUT /api/v1/pets/:id`: actualiza una mascota propia.
