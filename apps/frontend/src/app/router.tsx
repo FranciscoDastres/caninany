@@ -39,6 +39,30 @@ export const router = createBrowserRouter([
         },
       },
       {
+        path: "verificar-correo",
+        lazy: async () => {
+          const { VerifyEmailPage } =
+            await import("@/features/auth/pages/verify-email-page");
+          return { Component: VerifyEmailPage };
+        },
+      },
+      {
+        path: "recuperar-contrasena",
+        lazy: async () => {
+          const { ForgotPasswordPage } =
+            await import("@/features/auth/pages/forgot-password-page");
+          return { Component: ForgotPasswordPage };
+        },
+      },
+      {
+        path: "restablecer-contrasena",
+        lazy: async () => {
+          const { ResetPasswordPage } =
+            await import("@/features/auth/pages/reset-password-page");
+          return { Component: ResetPasswordPage };
+        },
+      },
+      {
         path: "perfil",
         lazy: async () => {
           const { ClientProfilePage } =
