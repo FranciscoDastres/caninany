@@ -20,14 +20,14 @@ export function FormField({
   return (
     <label
       className={cn(
-        "grid gap-2 text-sm font-extrabold text-[#344e41]",
+        "grid gap-2 text-sm font-extrabold text-[#443846]",
         className,
       )}
     >
       <span>{label}</span>
       {children}
       {hint && !error ? (
-        <span className="text-xs font-normal leading-5 text-[#849088]">
+        <span className="text-xs font-normal leading-5 text-[#756e77]">
           {hint}
         </span>
       ) : null}
