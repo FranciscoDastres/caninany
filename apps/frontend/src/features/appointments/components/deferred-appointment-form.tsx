@@ -52,16 +52,16 @@ function AppointmentFormPlaceholder(): JSX.Element {
       aria-label="Preparando formulario de reserva"
       role="status"
     >
-      <span className="h-5 w-36 rounded-full bg-[#e8e1d7]" />
-      <span className="h-8 w-2/3 rounded-xl bg-[#e8e1d7]" />
+      <span className="h-5 w-36 rounded-full bg-[#eee9ef]" />
+      <span className="h-8 w-2/3 rounded-xl bg-[#eee9ef]" />
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }, (_, index) => (
-          <span key={index} className="h-28 rounded-[1.15rem] bg-[#eee8df]" />
+          <span key={index} className="h-28 rounded-[1.15rem] bg-[#eee9ef]" />
         ))}
       </div>
-      <span className="h-14 rounded-xl bg-[#eee8df]" />
-      <span className="h-14 rounded-xl bg-[#eee8df]" />
-      <span className="h-40 rounded-[1.5rem] bg-[#eee8df]" />
+      <span className="h-14 rounded-xl bg-[#eee9ef]" />
+      <span className="h-14 rounded-xl bg-[#eee9ef]" />
+      <span className="h-40 rounded-[1.5rem] bg-[#eee9ef]" />
     </div>
   );
 }
