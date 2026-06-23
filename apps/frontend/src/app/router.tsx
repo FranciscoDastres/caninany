@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { PrivateRoute } from "@/core/auth/private-route";
+import { AboutPage } from "@/features/marketing/pages/about-page";
 import { HomePage } from "@/features/marketing/pages/home-page";
 
 import { RootLayout } from "./root-layout";
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
     HydrateFallback: RouteFallback,
     children: [
       { index: true, element: <HomePage /> },
+      { path: "nosotros", element: <AboutPage /> },
       {
         path: "agendar",
         lazy: async () => {
