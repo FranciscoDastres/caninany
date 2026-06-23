@@ -2,7 +2,6 @@ import type { UserRole } from "@caninany/shared";
 import type { JSX, PropsWithChildren } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-import { decodeAccessToken } from "@/core/auth/jwt";
 import { useAuthStore } from "@/store/auth.store";
 
 interface PrivateRouteProps extends PropsWithChildren {
@@ -15,26 +14,26 @@ export function PrivateRoute({
 }: PrivateRouteProps): JSX.Element {
   const location = useLocation();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const status = useAuthStore((state) => state.status);
   const user = useAuthStore((state) => state.user);
-  const tokenPayload = accessToken ? decodeAccessToken(accessToken) : null;
 
-  if (
-    !accessToken ||
-    !user ||
-    !tokenPayload ||
-    tokenPayload.exp * 1000 <= Date.now()
-  ) {
+  if (status === "initializing") {
+    return (
+      <div className="site-container py-20 text-center text-sm font-semibold text-brand-primary">
+        Cargando sesión...
+      </div>
+    );
+  }
+
+  if (!accessToken || !user || status !== "authenticated") {
     return (
       <Navigate to="/ingresar" replace state={{ from: location.pathname }} />
     );
   }
 
-  if (role && tokenPayload.role !== role) {
+  if (role && user.role !== role) {
     return (
-      <Navigate
-        to={tokenPayload.role === "admin" ? "/admin" : "/perfil"}
-        replace
-      />
+      <Navigate to={user.role === "admin" ? "/admin" : "/perfil"} replace />
     );
   }
 
