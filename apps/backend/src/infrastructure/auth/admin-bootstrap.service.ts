@@ -31,6 +31,7 @@ export class AdminBootstrapService implements OnModuleInit {
 
     await this.users.create({
       email,
+      emailVerifiedAt: new Date(),
       name,
       passwordHash: await this.passwords.hash(password),
       role: "admin",
