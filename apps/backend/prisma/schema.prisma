@@ -14,6 +14,20 @@ enum UserRole {
   CLIENT
 }
 
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ExternalIdentityProvider {
+  GOOGLE
+}
+
+enum AuthTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
 enum AppointmentService {
   BATH
   EAR_CLEANING
@@ -30,15 +44,68 @@ enum AppointmentStatus {
 model User {
   id                       String              @id @default(uuid()) @db.Uuid
   email                    String              @unique
-  passwordHash             String
+  passwordHash             String?
   name                     String
   role                     UserRole            @default(CLIENT)
+  status                   UserStatus          @default(ACTIVE)
+  emailVerifiedAt          DateTime?
+  phone                    String?
+  avatarUrl                String?
+  externalIdentities       ExternalIdentity[]
+  sessions                 AuthSession[]
+  authTokens               AuthToken[]
   pets                     Pet[]
   appointments             Appointment[]
   purchases                Purchase[]
   siteConfigurationUpdates SiteConfiguration[] @relation("SiteConfigurationUpdatedBy")
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
+}
+
+model ExternalIdentity {
+  id              String                   @id @default(uuid()) @db.Uuid
+  userId          String                   @db.Uuid
+  user            User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider        ExternalIdentityProvider
+  providerSubject String
+  email           String?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  @@unique([provider, providerSubject])
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @db.Uuid
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String
+  expiresAt        DateTime  @db.Timestamptz(3)
+  lastUsedAt       DateTime  @default(now()) @db.Timestamptz(3)
+  revokedAt        DateTime? @db.Timestamptz(3)
+  userAgent        String?
+  ipAddress        String?
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model AuthToken {
+  id        String        @id @default(uuid()) @db.Uuid
+  userId    String        @db.Uuid
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AuthTokenType
+  tokenHash String        @unique
+  expiresAt DateTime      @db.Timestamptz(3)
+  usedAt    DateTime?     @db.Timestamptz(3)
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+
+  @@index([userId, type, usedAt])
+  @@index([expiresAt])
 }
 
 model Pet {
