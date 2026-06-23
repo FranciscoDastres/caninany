@@ -17,6 +17,7 @@ export class JwtTokenIssuer implements TokenIssuer {
       email: payload.email,
       name: payload.name,
       role: payload.role,
+      sessionId: payload.sessionId,
     });
   }
 }
