@@ -112,24 +112,24 @@ export function PetManagement(): JSX.Element {
   });
 
   return (
-    <article className="overflow-hidden rounded-[2rem] border border-[#e0d8cd] bg-white shadow-[0_18px_60px_rgba(35,67,52,0.08)]">
-      <div className="flex flex-col gap-4 border-b border-[#ece5dc] px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+    <article className="overflow-hidden border border-[#dfd7e0] bg-white shadow-[0_18px_60px_rgba(116,71,118,0.08)]">
+      <div className="flex flex-col gap-4 border-b border-[#ebe4ec] px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <div className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-xl bg-[#f4dfd1] text-[#a65f40]">
+          <span className="grid size-11 place-items-center bg-[#f0e8f1] text-brand-primary">
             <PawPrint className="size-5" />
           </span>
           <div>
-            <h2 className="font-display text-2xl text-[#183c2d]">
+            <h2 className="font-display text-2xl text-[#744776]">
               Mis mascotas
             </h2>
-            <p className="text-sm text-[#75827b]">
+            <p className="text-sm text-[#756e77]">
               Mantén sus datos listos para futuras reservas.
             </p>
           </div>
         </div>
         <button
           type="button"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#214e3b] px-5 text-sm font-extrabold text-white"
+          className="inline-flex h-11 items-center justify-center gap-2 bg-brand-primary px-5 text-sm font-extrabold text-white"
           onClick={formOpen ? closeForm : openCreateForm}
         >
           {formOpen ? <X className="size-4" /> : <Plus className="size-4" />}
@@ -139,10 +139,11 @@ export function PetManagement(): JSX.Element {
 
       {message ? (
         <p
+          role={message.tone === "error" ? "alert" : "status"}
           className={`mx-6 mt-5 rounded-xl px-4 py-3 text-sm font-semibold sm:mx-8 ${
             message.tone === "error"
               ? "bg-red-50 text-red-700"
-              : "bg-[#eef2e8] text-[#315f49]"
+              : "bg-[#f0e8f1] text-[#8f6291]"
           }`}
         >
           {message.text}
@@ -151,7 +152,7 @@ export function PetManagement(): JSX.Element {
 
       {formOpen ? (
         <form
-          className="grid gap-5 border-b border-[#ece5dc] bg-[#fffaf3] p-6 sm:p-8"
+          className="grid gap-5 border-b border-[#ebe4ec] bg-[#ffffff] p-6 sm:p-8"
           onSubmit={onSubmit}
         >
           <div className="grid gap-5 sm:grid-cols-2">
@@ -210,7 +211,7 @@ export function PetManagement(): JSX.Element {
           <button
             type="submit"
             disabled={saveMutation.isPending}
-            className="inline-flex h-12 w-fit items-center justify-center gap-2 rounded-full bg-[#214e3b] px-6 text-sm font-extrabold text-white disabled:opacity-60"
+            className="inline-flex h-12 w-fit items-center justify-center gap-2 bg-brand-primary px-6 text-sm font-extrabold text-white disabled:opacity-60"
           >
             <Save className="size-4" />
             {saveMutation.isPending
@@ -223,7 +224,7 @@ export function PetManagement(): JSX.Element {
       ) : null}
 
       {pets.isPending ? (
-        <p className="px-8 py-12 text-center text-[#6d7b73]">
+        <p className="px-8 py-12 text-center text-[#756e77]">
           Cargando tus mascotas...
         </p>
       ) : pets.isError ? (
@@ -232,11 +233,11 @@ export function PetManagement(): JSX.Element {
         </p>
       ) : pets.data.length === 0 ? (
         <div className="grid place-items-center px-8 py-14 text-center">
-          <PawPrint className="size-10 text-[#b16d4b]" />
-          <h3 className="mt-4 font-display text-2xl text-[#183c2d]">
+          <PawPrint className="size-10 text-[#8f6291]" />
+          <h3 className="mt-4 font-display text-2xl text-[#744776]">
             Agrega tu primera mascota.
           </h3>
-          <p className="mt-2 max-w-md text-[#75827b]">
+          <p className="mt-2 max-w-md text-[#756e77]">
             Su peso y necesidades se usarán para calcular correctamente las
             próximas reservas.
           </p>
@@ -280,30 +281,30 @@ function PetCard({
   pet,
 }: PetCardProps): JSX.Element {
   return (
-    <section className="rounded-[1.5rem] border border-[#e5ddd2] bg-[#fffaf3] p-5">
+    <section className="border border-[#e4dde5] bg-brand-cream p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-display text-2xl text-[#183c2d]">{pet.name}</h3>
-          <p className="mt-1 text-sm text-[#75827b]">
+          <h3 className="font-display text-2xl text-[#744776]">{pet.name}</h3>
+          <p className="mt-1 text-sm text-[#756e77]">
             {pet.breed || "Raza no indicada"} · {pet.weightKg} kg
           </p>
         </div>
-        <span className="grid size-10 place-items-center rounded-full bg-[#dce8db] text-[#315f49]">
+        <span className="grid size-10 place-items-center rounded-full bg-[#f0e8f1] text-[#8f6291]">
           <PawPrint className="size-4" />
         </span>
       </div>
 
       {pet.medicalNotes || pet.behaviorNotes ? (
-        <div className="mt-5 space-y-3 border-t border-[#e8e0d6] pt-4 text-sm leading-6 text-[#607269]">
+        <div className="mt-5 space-y-3 border-t border-[#e6dfe7] pt-4 text-sm leading-6 text-[#6b646d]">
           {pet.medicalNotes ? (
             <p>
-              <strong className="text-[#344e41]">Salud:</strong>{" "}
+              <strong className="text-[#443846]">Salud:</strong>{" "}
               {pet.medicalNotes}
             </p>
           ) : null}
           {pet.behaviorNotes ? (
             <p>
-              <strong className="text-[#344e41]">Comportamiento:</strong>{" "}
+              <strong className="text-[#443846]">Comportamiento:</strong>{" "}
               {pet.behaviorNotes}
             </p>
           ) : null}
@@ -313,7 +314,7 @@ function PetCard({
       <div className="mt-5 flex gap-2">
         <button
           type="button"
-          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-[#cfc5b8] text-sm font-bold text-[#214e3b]"
+          className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full border border-[#cfc5d1] text-sm font-bold text-[#8f6291]"
           onClick={onEdit}
         >
           <Edit3 className="size-4" />
@@ -322,7 +323,7 @@ function PetCard({
         <button
           type="button"
           disabled={disabled}
-          className="grid size-10 place-items-center rounded-full border border-[#e2c8bc] text-[#a44f35] disabled:opacity-50"
+          className="grid size-10 place-items-center rounded-full border border-[#dfcbe1] text-[#8f6291] disabled:opacity-50"
           aria-label={`Retirar a ${pet.name}`}
           onClick={onArchive}
         >
