@@ -63,23 +63,23 @@ export function SiteContentEditor(): JSX.Element {
   });
 
   return (
-    <article className="rounded-[2rem] border border-[#e0d8cd] bg-white shadow-[0_18px_60px_rgba(35,67,52,0.08)]">
-      <div className="flex items-center gap-3 border-b border-[#ece5dc] px-6 py-5 sm:px-8">
-        <span className="grid size-11 place-items-center rounded-xl bg-[#f4dfd1] text-[#a65f40]">
+    <article className="border border-[#dfd7e0] bg-white shadow-[0_18px_60px_rgba(116,71,118,0.08)]">
+      <div className="flex items-center gap-3 border-b border-[#ebe4ec] px-6 py-5 sm:px-8">
+        <span className="grid size-11 place-items-center bg-[#f0e8f1] text-brand-primary">
           <Settings2 className="size-5" />
         </span>
         <div>
-          <h2 className="font-display text-2xl text-[#183c2d]">
+          <h2 className="font-display text-2xl text-[#744776]">
             Editor de contenido
           </h2>
-          <p className="text-sm text-[#75827b]">
+          <p className="text-sm text-[#756e77]">
             Actualiza los textos e imagen principal de la portada.
           </p>
         </div>
       </div>
 
       {configuration.isPending ? (
-        <p className="px-8 py-12 text-center text-[#6d7b73]">
+        <p className="px-8 py-12 text-center text-[#756e77]">
           Cargando contenido...
         </p>
       ) : configuration.isError ? (
@@ -121,7 +121,7 @@ export function SiteContentEditor(): JSX.Element {
               >
                 <Input {...register("heroImageUrl")} />
               </FormField>
-              <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-[#cfc5b8] px-5 py-3 text-sm font-extrabold text-[#214e3b]">
+              <label className="inline-flex w-fit cursor-pointer items-center gap-2 border border-[#cfc5d1] px-5 py-3 text-sm font-extrabold text-brand-primary">
                 <ImageUp className="size-4" />
                 {imageMutation.isPending ? "Subiendo..." : "Subir imagen"}
                 <input
@@ -135,11 +135,11 @@ export function SiteContentEditor(): JSX.Element {
                   }}
                 />
               </label>
-              <p className="text-xs leading-5 text-[#849088]">
+              <p className="text-xs leading-5 text-[#756e77]">
                 Formatos JPG, PNG o WebP. Máximo 5 MB.
               </p>
             </div>
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-[#eef2e8]">
+            <div className="aspect-[4/3] overflow-hidden bg-brand-soft">
               {heroImageUrl ? (
                 <img
                   src={heroImageUrl}
@@ -176,7 +176,10 @@ export function SiteContentEditor(): JSX.Element {
           </FormField>
 
           {message ? (
-            <p className="rounded-xl bg-[#eef2e8] px-4 py-3 text-sm font-semibold text-[#315f49]">
+            <p
+              role="status"
+              className="bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-primary"
+            >
               {message}
             </p>
           ) : null}
@@ -184,7 +187,7 @@ export function SiteContentEditor(): JSX.Element {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex h-13 w-fit items-center justify-center gap-3 rounded-full bg-[#214e3b] px-7 text-sm font-extrabold text-white transition hover:bg-[#183c2d] disabled:opacity-60"
+            className="inline-flex h-13 w-fit items-center justify-center gap-3 bg-brand-primary px-7 text-sm font-extrabold text-white transition hover:bg-brand-deep disabled:opacity-60"
           >
             <Save className="size-4" />
             {isSubmitting ? "Guardando..." : "Guardar cambios"}
