@@ -29,29 +29,32 @@ export function UserManagement(): JSX.Element {
   });
 
   return (
-    <article className="overflow-hidden rounded-[2rem] border border-[#e0d8cd] bg-white shadow-[0_18px_60px_rgba(35,67,52,0.08)]">
-      <div className="flex items-center gap-3 border-b border-[#ece5dc] px-6 py-5 sm:px-8">
-        <span className="grid size-11 place-items-center rounded-xl bg-[#dce8db] text-[#315f49]">
+    <article className="overflow-hidden border border-[#dfd7e0] bg-white shadow-[0_18px_60px_rgba(116,71,118,0.08)]">
+      <div className="flex items-center gap-3 border-b border-[#ebe4ec] px-6 py-5 sm:px-8">
+        <span className="grid size-11 place-items-center bg-brand-soft text-brand-primary">
           <Users className="size-5" />
         </span>
         <div>
-          <h2 className="font-display text-2xl text-[#183c2d]">
+          <h2 className="font-display text-2xl text-[#744776]">
             Gestión de usuarios
           </h2>
-          <p className="text-sm text-[#75827b]">
+          <p className="text-sm text-[#756e77]">
             Revisa usuarios y administra sus permisos.
           </p>
         </div>
       </div>
 
       {message ? (
-        <p className="mx-6 mt-5 rounded-xl bg-[#eef2e8] px-4 py-3 text-sm font-semibold text-[#315f49] sm:mx-8">
+        <p
+          role="status"
+          className="mx-6 mt-5 bg-brand-soft px-4 py-3 text-sm font-semibold text-brand-primary sm:mx-8"
+        >
           {message}
         </p>
       ) : null}
 
       {users.isPending ? (
-        <p className="px-8 py-12 text-center text-[#6d7b73]">
+        <p className="px-8 py-12 text-center text-[#756e77]">
           Cargando usuarios...
         </p>
       ) : users.isError ? (
@@ -61,7 +64,7 @@ export function UserManagement(): JSX.Element {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-left">
-            <thead className="bg-[#f7f3ed] text-xs uppercase tracking-[0.12em] text-[#718078]">
+            <thead className="bg-[#f7f5f7] text-xs uppercase tracking-[0.12em] text-[#756e77]">
               <tr>
                 <th className="px-8 py-4">Usuario</th>
                 <th className="px-6 py-4">Correo</th>
@@ -69,15 +72,15 @@ export function UserManagement(): JSX.Element {
                 <th className="px-8 py-4 text-right">Rol</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#eee7de]">
+            <tbody className="divide-y divide-[#e9e3ea]">
               {users.data.map((user) => {
                 const isCurrentUser = user.id === currentUser?.id;
                 return (
-                  <tr key={user.id} className="text-sm text-[#40574c]">
-                    <td className="px-8 py-5 font-bold text-[#29483a]">
+                  <tr key={user.id} className="text-sm text-[#514853]">
+                    <td className="px-8 py-5 font-bold text-[#403441]">
                       <span className="flex items-center gap-2">
                         {user.role === "admin" ? (
-                          <ShieldCheck className="size-4 text-[#b16d4b]" />
+                          <ShieldCheck className="size-4 text-[#8f6291]" />
                         ) : null}
                         {user.name}
                       </span>
