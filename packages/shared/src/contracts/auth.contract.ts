@@ -9,6 +9,8 @@ export interface AuthUserDto {
   id: string;
   email: string;
   emailVerifiedAt: string | null;
+  hasGoogleIdentity?: boolean;
+  hasPassword?: boolean;
   name: string;
   phone: string | null;
   role: UserRole;
