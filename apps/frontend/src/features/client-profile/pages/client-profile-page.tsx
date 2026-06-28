@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { PetManagement } from "@/features/pets/components/pet-management";
 
+import { AccountSecurityPanel } from "../components/account-security-panel";
 import { useMyPurchases } from "../hooks/use-my-purchases";
 
 const currencyFormatter = new Intl.NumberFormat("es-CL", {
@@ -39,6 +40,7 @@ export function ClientProfilePage(): JSX.Element {
         </div>
 
         <div className="mt-10 grid gap-8">
+          <AccountSecurityPanel />
           <PetManagement />
 
           <div className="overflow-hidden border border-[#dfd7e0] bg-white shadow-[0_18px_60px_rgba(116,71,118,0.08)]">
