@@ -33,6 +33,7 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listByCustomer: vi.fn(async () => []),
       save: vi.fn(async (appointment) => {
         persisted.push(appointment);
       }),
@@ -73,6 +74,7 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => true),
+      listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
@@ -96,6 +98,7 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
@@ -120,6 +123,7 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
