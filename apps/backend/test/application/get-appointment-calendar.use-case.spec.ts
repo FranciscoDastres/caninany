@@ -32,8 +32,10 @@ describe("GetAppointmentCalendarUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => [occupiedPeriod]),
       hasActiveOverlap: vi.fn(async () => false),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
+      updateStatus: vi.fn(async () => null),
     };
     const clock: Clock = {
       now: () => new Date("2026-06-13T12:00:00.000Z"),
