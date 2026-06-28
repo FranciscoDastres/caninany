@@ -16,6 +16,7 @@ import {
   AccountSuspendedError,
   AppointmentConflictError,
   AppointmentInPastError,
+  AppointmentNotFoundError,
   AppointmentOutsideBusinessHoursError,
   CannotChangeOwnRoleError,
   EmailAlreadyRegisteredError,
@@ -35,6 +36,7 @@ import {
 @Catch(
   AppointmentConflictError,
   AppointmentInPastError,
+  AppointmentNotFoundError,
   AppointmentOutsideBusinessHoursError,
   InvalidPetWeightError,
   EmailAlreadyRegisteredError,
@@ -56,6 +58,7 @@ export class DomainExceptionFilter implements ExceptionFilter {
     exception:
       | AppointmentConflictError
       | AppointmentInPastError
+      | AppointmentNotFoundError
       | AppointmentOutsideBusinessHoursError
       | InvalidPetWeightError
       | EmailAlreadyRegisteredError
@@ -100,7 +103,8 @@ export class DomainExceptionFilter implements ExceptionFilter {
                 exception instanceof AccountSuspendedError
               ? new UnauthorizedException(exception.message)
               : exception instanceof UserNotFoundError ||
-                  exception instanceof PetNotFoundError
+                  exception instanceof PetNotFoundError ||
+                  exception instanceof AppointmentNotFoundError
                 ? new NotFoundException(exception.message)
                 : exception instanceof CannotChangeOwnRoleError
                   ? new BadRequestException(exception.message)
