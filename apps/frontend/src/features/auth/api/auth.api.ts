@@ -1,5 +1,6 @@
 import type {
   AuthResponseDto,
+  AuthSessionDto,
   EmailActionInput,
   GoogleCredentialInput,
   GoogleLinkInput,
@@ -93,4 +94,22 @@ export function bootstrapSession(): Promise<AuthResponseDto> {
 
 export async function logout(): Promise<void> {
   await httpClient.post<void>("/auth/logout");
+}
+
+export async function logoutAll(): Promise<void> {
+  await httpClient.post<void>("/auth/logout-all");
+}
+
+export async function getSessions(): Promise<AuthSessionDto[]> {
+  const response = await httpClient.get<AuthSessionDto[]>("/auth/sessions");
+  return response.data;
+}
+
+export async function revokeSession(sessionId: string): Promise<void> {
+  await httpClient.delete<void>(`/auth/sessions/${sessionId}`);
+}
+
+export async function unlinkGoogle(): Promise<MessageResponseDto> {
+  const response = await httpClient.delete<MessageResponseDto>("/auth/google");
+  return response.data;
 }
