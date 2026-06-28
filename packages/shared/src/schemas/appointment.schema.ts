@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 import { PET_WEIGHT_LIMITS } from "../constants/pet-weight.constants";
-import { APPOINTMENT_SERVICES } from "../contracts/appointment.contract";
+import {
+  APPOINTMENT_SERVICES,
+  APPOINTMENT_STATUSES,
+} from "../contracts/appointment.contract";
 
 export const createAppointmentSchema = z.object({
   customerId: z.uuid().optional(),
@@ -57,6 +60,12 @@ export const createPublicAppointmentRequestSchema = z.object({
   notes: z.string().trim().max(500, "Máximo 500 caracteres.").optional(),
 });
 
+export const updateAppointmentStatusSchema = z.object({
+  status: z.enum(APPOINTMENT_STATUSES, {
+    error: "Selecciona un estado valido.",
+  }),
+});
+
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>;
 export type GetAvailableSlotsQuery = z.infer<
   typeof getAvailableSlotsQuerySchema
@@ -66,4 +75,7 @@ export type GetAppointmentCalendarQuery = z.infer<
 >;
 export type CreatePublicAppointmentRequestInput = z.infer<
   typeof createPublicAppointmentRequestSchema
+>;
+export type UpdateAppointmentStatusInput = z.infer<
+  typeof updateAppointmentStatusSchema
 >;
