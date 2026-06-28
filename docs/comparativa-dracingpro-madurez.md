@@ -245,7 +245,7 @@ end-to-end:
 ### Fase 1: citas operables
 
 - Agregar historial de estado de citas.
-- Agregar endpoints admin para listar y cambiar estado.
+- [x] Agregar endpoints admin para listar y cambiar estado.
 - Agregar cancelacion/reagendamiento cliente.
 - Agregar detalle de cita para cliente.
 - Agregar tests backend de transiciones y conflictos.
