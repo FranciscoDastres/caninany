@@ -32,6 +32,7 @@ describe("GetAppointmentCalendarUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => [occupiedPeriod]),
       hasActiveOverlap: vi.fn(async () => false),
+      listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
     };
     const clock: Clock = {
