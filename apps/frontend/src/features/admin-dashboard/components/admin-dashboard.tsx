@@ -3,6 +3,7 @@ import type { JSX } from "react";
 
 import { useAuthStore } from "@/store/auth.store";
 
+import { AppointmentManagement } from "./appointment-management";
 import { SiteContentEditor } from "./site-content-editor";
 import { UserManagement } from "./user-management";
 
@@ -31,6 +32,7 @@ export function AdminDashboard(): JSX.Element {
         </div>
 
         <div className="mt-10 grid gap-8">
+          <AppointmentManagement />
           <UserManagement />
           <SiteContentEditor />
         </div>
