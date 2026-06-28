@@ -4,6 +4,7 @@ import { Appointment } from "../../../../domain/entities/appointment.entity";
 import { AppointmentConflictError } from "../../../../domain/errors/domain.error";
 import type {
   AppointmentBusyPeriod,
+  CustomerAppointmentRecord,
   AppointmentRepository,
 } from "../../../../domain/repositories/appointment.repository";
 import { PrismaService } from "../prisma.service";
@@ -19,6 +20,19 @@ const statusToPersistence = {
   confirmed: "CONFIRMED",
   completed: "COMPLETED",
   cancelled: "CANCELLED",
+} as const;
+
+const serviceFromPersistence = {
+  BATH: "bath",
+  EAR_CLEANING: "ear-cleaning",
+  BATH_AND_EAR_CLEANING: "bath-and-ear-cleaning",
+} as const;
+
+const statusFromPersistence = {
+  PENDING: "pending",
+  CONFIRMED: "confirmed",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
 } as const;
 
 @Injectable()
@@ -54,6 +68,40 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     });
 
     return appointment !== null;
+  }
+
+  async listByCustomer(
+    customerId: string,
+  ): Promise<CustomerAppointmentRecord[]> {
+    const appointments = await this.prisma.appointment.findMany({
+      where: { customerId },
+      orderBy: { startsAt: "desc" },
+      select: {
+        id: true,
+        customerId: true,
+        petId: true,
+        pet: { select: { name: true } },
+        service: true,
+        startsAt: true,
+        endsAt: true,
+        durationMinutes: true,
+        status: true,
+        notes: true,
+      },
+    });
+
+    return appointments.map((appointment) => ({
+      id: appointment.id,
+      customerId: appointment.customerId,
+      petId: appointment.petId,
+      petName: appointment.pet?.name ?? null,
+      service: serviceFromPersistence[appointment.service],
+      startsAt: appointment.startsAt,
+      endsAt: appointment.endsAt,
+      durationMinutes: appointment.durationMinutes,
+      status: statusFromPersistence[appointment.status],
+      notes: appointment.notes,
+    }));
   }
 
   async save(appointment: Appointment): Promise<void> {
