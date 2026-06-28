@@ -1,4 +1,6 @@
 import type {
+  AdminAppointmentDto,
+  AppointmentStatus,
   SiteConfigurationDto,
   UpdateSiteConfigurationInput,
   UploadedImageDto,
@@ -20,6 +22,24 @@ export async function updateUserRole(
   const response = await httpClient.patch<UserSummaryDto>(
     `/usuarios/${userId}/rol`,
     { role },
+  );
+  return response.data;
+}
+
+export async function getAdminAppointments(): Promise<AdminAppointmentDto[]> {
+  const response = await httpClient.get<AdminAppointmentDto[]>(
+    "/appointments/admin",
+  );
+  return response.data;
+}
+
+export async function updateAppointmentStatus(
+  appointmentId: string,
+  status: AppointmentStatus,
+): Promise<AdminAppointmentDto> {
+  const response = await httpClient.patch<AdminAppointmentDto>(
+    `/appointments/admin/${appointmentId}/status`,
+    { status },
   );
   return response.data;
 }
