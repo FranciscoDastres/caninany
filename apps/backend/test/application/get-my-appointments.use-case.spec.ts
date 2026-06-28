@@ -8,6 +8,7 @@ describe("GetMyAppointmentsUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => [
         {
           id: "appointment-1",
@@ -23,6 +24,7 @@ describe("GetMyAppointmentsUseCase", () => {
         },
       ]),
       save: vi.fn(async () => undefined),
+      updateStatus: vi.fn(async () => null),
     };
     const useCase = new GetMyAppointmentsUseCase(appointments);
 
