@@ -33,10 +33,12 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => []),
       save: vi.fn(async (appointment) => {
         persisted.push(appointment);
       }),
+      updateStatus: vi.fn(async () => null),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
       new ScheduleAppointmentService(appointments, ids, clock, calendar),
@@ -74,8 +76,10 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => true),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
+      updateStatus: vi.fn(async () => null),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
       new ScheduleAppointmentService(appointments, ids, clock, calendar),
@@ -98,8 +102,10 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
+      updateStatus: vi.fn(async () => null),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
       new ScheduleAppointmentService(appointments, ids, clock, calendar),
@@ -123,8 +129,10 @@ describe("CreatePublicAppointmentRequestUseCase", () => {
     const appointments: AppointmentRepository = {
       findBusyPeriods: vi.fn(async () => []),
       hasActiveOverlap: vi.fn(async () => false),
+      listForAdmin: vi.fn(async () => []),
       listByCustomer: vi.fn(async () => []),
       save: vi.fn(async () => undefined),
+      updateStatus: vi.fn(async () => null),
     };
     const useCase = new CreatePublicAppointmentRequestUseCase(
       new ScheduleAppointmentService(appointments, ids, clock, calendar),
