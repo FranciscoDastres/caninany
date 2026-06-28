@@ -6,6 +6,15 @@ export const APPOINTMENT_SERVICES = [
 
 export type AppointmentService = (typeof APPOINTMENT_SERVICES)[number];
 
+export const APPOINTMENT_STATUSES = [
+  "pending",
+  "confirmed",
+  "completed",
+  "cancelled",
+] as const;
+
+export type AppointmentStatus = (typeof APPOINTMENT_STATUSES)[number];
+
 export interface AppointmentDto {
   id: string;
   customerId: string | null;
@@ -15,8 +24,19 @@ export interface AppointmentDto {
   startsAt: string;
   endsAt: string;
   durationMinutes: number;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status: AppointmentStatus;
   notes?: string;
+}
+
+export interface AdminAppointmentDto extends AppointmentDto {
+  createdAt: string;
+  customerEmail: string | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  ownerEmail: string | null;
+  ownerName: string | null;
+  ownerPhone: string | null;
+  petWeightKg: number | null;
 }
 
 export interface AvailableSlotsDto {
