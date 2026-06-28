@@ -32,6 +32,7 @@ import { CreateAppointmentUseCase } from "../../../application/use-cases/create-
 import { CreatePublicAppointmentRequestUseCase } from "../../../application/use-cases/create-public-appointment-request.use-case";
 import { GetAppointmentCalendarUseCase } from "../../../application/use-cases/get-appointment-calendar.use-case";
 import { GetAvailableSlotsUseCase } from "../../../application/use-cases/get-available-slots.use-case";
+import { GetMyAppointmentsUseCase } from "../../../application/use-cases/get-my-appointments.use-case";
 import type { AuthenticatedUser } from "../../auth/authenticated-user";
 import { CurrentUser } from "../../auth/current-user.decorator";
 import { JwtAuthGuard } from "../../auth/jwt-auth.guard";
@@ -47,6 +48,7 @@ export class AppointmentsController {
     private readonly createPublicRequest: CreatePublicAppointmentRequestUseCase,
     private readonly getCalendar: GetAppointmentCalendarUseCase,
     private readonly getAvailableSlots: GetAvailableSlotsUseCase,
+    private readonly getMyAppointments: GetMyAppointmentsUseCase,
   ) {}
 
   @Get("calendar")
@@ -65,6 +67,17 @@ export class AppointmentsController {
     query: GetAvailableSlotsQuery,
   ): Promise<AvailableSlotsDto> {
     return this.getAvailableSlots.execute(query);
+  }
+
+  @Get("my")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("cliente")
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: "Appointments for the authenticated client." })
+  listMyAppointments(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<AppointmentDto[]> {
+    return this.getMyAppointments.execute(user.id);
   }
 
   @Post("requests")
