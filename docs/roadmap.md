@@ -76,9 +76,9 @@ horario antes de atraer más reservas.
 - Definir el ciclo de estados: solicitada, confirmada, completada, cancelada,
   expirada y ausencia.
 - Agregar `expiresAt`, motivo de cancelación y timestamps de transición.
-- Crear endpoints administrativos para listar, ver y cambiar el estado de una
+- [x] Crear endpoints administrativos para listar y cambiar el estado de una
   solicitud.
-- Crear una bandeja administrativa mínima de solicitudes pendientes.
+- [x] Crear una bandeja administrativa mínima de solicitudes pendientes.
 - Liberar automáticamente solicitudes expiradas mediante un proceso
   idempotente.
 - Definir anticipación mínima y horizonte máximo de reserva configurables.
@@ -130,7 +130,8 @@ Objetivo: que el negocio pueda operar el día a día desde la aplicación.
 
 - Crear agenda diaria y semanal con filtros por estado, servicio y cliente.
 - Mostrar detalle de contacto, mascota, notas, duración e historial de cambios.
-- Confirmar, completar, cancelar, expirar y marcar ausencia.
+- Confirmar, completar y cancelar desde el panel ya existe; falta expirar y
+  marcar ausencia.
 - Crear reservas en nombre de clientes o invitados.
 - Crear y editar clientes y mascotas para atención telefónica.
 - Añadir búsqueda, paginación y filtros en usuarios y citas.
