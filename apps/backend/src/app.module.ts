@@ -52,6 +52,7 @@ import { CreateAppointmentUseCase } from "./application/use-cases/create-appoint
 import { CreatePublicAppointmentRequestUseCase } from "./application/use-cases/create-public-appointment-request.use-case";
 import { GetAppointmentCalendarUseCase } from "./application/use-cases/get-appointment-calendar.use-case";
 import { GetAvailableSlotsUseCase } from "./application/use-cases/get-available-slots.use-case";
+import { GetMyAppointmentsUseCase } from "./application/use-cases/get-my-appointments.use-case";
 import {
   APPOINTMENT_REPOSITORY,
   type AppointmentRepository,
@@ -257,6 +258,12 @@ import { AuthNotificationService } from "./infrastructure/mail/auth-notification
         calendar: IntlBusinessCalendar,
         clock: SystemClock,
       ) => new GetAppointmentCalendarUseCase(appointments, calendar, clock),
+    },
+    {
+      provide: GetMyAppointmentsUseCase,
+      inject: [APPOINTMENT_REPOSITORY],
+      useFactory: (appointments: AppointmentRepository) =>
+        new GetMyAppointmentsUseCase(appointments),
     },
     {
       provide: AuthApplicationService,
