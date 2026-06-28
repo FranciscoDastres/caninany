@@ -1,8 +1,12 @@
 import { Injectable } from "@nestjs/common";
 
-import { Appointment } from "../../../../domain/entities/appointment.entity";
+import {
+  Appointment,
+  type AppointmentStatus,
+} from "../../../../domain/entities/appointment.entity";
 import { AppointmentConflictError } from "../../../../domain/errors/domain.error";
 import type {
+  AdminAppointmentRecord,
   AppointmentBusyPeriod,
   CustomerAppointmentRecord,
   AppointmentRepository,
@@ -34,6 +38,60 @@ const statusFromPersistence = {
   COMPLETED: "completed",
   CANCELLED: "cancelled",
 } as const;
+
+interface AdminAppointmentPersistence {
+  createdAt: Date;
+  customer: {
+    email: string;
+    name: string;
+    phone: string | null;
+  } | null;
+  customerId: string | null;
+  durationMinutes: number;
+  email: string | null;
+  endsAt: Date;
+  id: string;
+  notes: string | null;
+  ownerName: string | null;
+  pet: {
+    name: string;
+    weightKg: { toString(): string } | number;
+  } | null;
+  petId: string | null;
+  petName: string | null;
+  petWeightKg: { toString(): string } | number | null;
+  phone: string | null;
+  service: keyof typeof serviceFromPersistence;
+  startsAt: Date;
+  status: keyof typeof statusFromPersistence;
+}
+
+const adminAppointmentSelect = {
+  id: true,
+  customerId: true,
+  customer: { select: { name: true, email: true, phone: true } },
+  petId: true,
+  pet: { select: { name: true, weightKg: true } },
+  ownerName: true,
+  phone: true,
+  email: true,
+  petName: true,
+  petWeightKg: true,
+  service: true,
+  startsAt: true,
+  endsAt: true,
+  durationMinutes: true,
+  status: true,
+  notes: true,
+  createdAt: true,
+} as const;
+
+function decimalToNumber(
+  value: { toString(): string } | number | null | undefined,
+): number | null {
+  if (value === null || value === undefined) return null;
+  return typeof value === "number" ? value : Number(value.toString());
+}
 
 @Injectable()
 export class PrismaAppointmentRepository implements AppointmentRepository {
@@ -68,6 +126,17 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     });
 
     return appointment !== null;
+  }
+
+  async listForAdmin(): Promise<AdminAppointmentRecord[]> {
+    const appointments = await this.prisma.appointment.findMany({
+      orderBy: { startsAt: "desc" },
+      select: adminAppointmentSelect,
+    });
+
+    return appointments.map((appointment) =>
+      this.toAdminAppointmentRecord(appointment),
+    );
   }
 
   async listByCustomer(
@@ -147,5 +216,57 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
       }
       throw error;
     }
+  }
+
+  async updateStatus(
+    id: string,
+    status: AppointmentStatus,
+  ): Promise<AdminAppointmentRecord | null> {
+    try {
+      const appointment = await this.prisma.appointment.update({
+        where: { id },
+        data: { status: statusToPersistence[status] },
+        select: adminAppointmentSelect,
+      });
+
+      return this.toAdminAppointmentRecord(appointment);
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "P2025"
+      ) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  private toAdminAppointmentRecord(
+    appointment: AdminAppointmentPersistence,
+  ): AdminAppointmentRecord {
+    return {
+      id: appointment.id,
+      customerId: appointment.customerId,
+      customerName: appointment.customer?.name ?? null,
+      customerEmail: appointment.customer?.email ?? null,
+      customerPhone: appointment.customer?.phone ?? null,
+      ownerName: appointment.ownerName,
+      ownerEmail: appointment.email,
+      ownerPhone: appointment.phone,
+      petId: appointment.petId,
+      petName: appointment.pet?.name ?? appointment.petName,
+      petWeightKg: decimalToNumber(
+        appointment.petWeightKg ?? appointment.pet?.weightKg,
+      ),
+      service: serviceFromPersistence[appointment.service],
+      startsAt: appointment.startsAt,
+      endsAt: appointment.endsAt,
+      durationMinutes: appointment.durationMinutes,
+      status: statusFromPersistence[appointment.status],
+      notes: appointment.notes,
+      createdAt: appointment.createdAt,
+    };
   }
 }
