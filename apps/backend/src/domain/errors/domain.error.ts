@@ -8,6 +8,7 @@ export class DomainError extends Error {
 export class InvalidPetWeightError extends DomainError {}
 export class AppointmentConflictError extends DomainError {}
 export class AppointmentInPastError extends DomainError {}
+export class AppointmentNotFoundError extends DomainError {}
 export class AppointmentOutsideBusinessHoursError extends DomainError {}
 export class EmailAlreadyRegisteredError extends DomainError {}
 export class InvalidCredentialsError extends DomainError {}
