@@ -145,7 +145,7 @@ export class AuthApplicationService {
     return {
       accessToken: await this.issueAccessToken(sessionUser, parsed.sessionId),
       refreshToken: nextToken.raw,
-      user: this.toDto(sessionUser),
+      user: await this.toDto(sessionUser),
     };
   }
 
@@ -352,7 +352,7 @@ export class AuthApplicationService {
     return {
       accessToken: await this.issueAccessToken(user, sessionId),
       refreshToken: refreshToken.raw,
-      user: this.toDto(user),
+      user: await this.toDto(user),
     };
   }
 
@@ -391,14 +391,16 @@ export class AuthApplicationService {
     }
   }
 
-  private toDto(
+  private async toDto(
     user: Awaited<ReturnType<UserRepository["create"]>>,
-  ): AuthUserDto {
+  ): Promise<AuthUserDto> {
     return {
       avatarUrl: user.avatarUrl,
       id: user.id,
       email: user.email,
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
+      hasGoogleIdentity: await this.users.hasGoogleIdentity(user.id),
+      hasPassword: Boolean(user.passwordHash),
       name: user.name,
       phone: user.phone,
       role: user.role,
