@@ -19,6 +19,11 @@ export async function createAppointment(
   return response.data;
 }
 
+export async function getMyAppointments(): Promise<AppointmentDto[]> {
+  const response = await httpClient.get<AppointmentDto[]>("/appointments/my");
+  return response.data;
+}
+
 export async function createPublicAppointmentRequest(
   input: CreatePublicAppointmentRequestInput,
 ): Promise<PublicAppointmentRequestDto> {
