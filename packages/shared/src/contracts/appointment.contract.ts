@@ -10,6 +10,7 @@ export interface AppointmentDto {
   id: string;
   customerId: string | null;
   petId: string | null;
+  petName?: string | null;
   service: AppointmentService;
   startsAt: string;
   endsAt: string;
