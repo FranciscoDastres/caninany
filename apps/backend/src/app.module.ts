@@ -53,6 +53,8 @@ import { CreatePublicAppointmentRequestUseCase } from "./application/use-cases/c
 import { GetAppointmentCalendarUseCase } from "./application/use-cases/get-appointment-calendar.use-case";
 import { GetAvailableSlotsUseCase } from "./application/use-cases/get-available-slots.use-case";
 import { GetMyAppointmentsUseCase } from "./application/use-cases/get-my-appointments.use-case";
+import { ListAdminAppointmentsUseCase } from "./application/use-cases/list-admin-appointments.use-case";
+import { UpdateAppointmentStatusUseCase } from "./application/use-cases/update-appointment-status.use-case";
 import {
   APPOINTMENT_REPOSITORY,
   type AppointmentRepository,
@@ -264,6 +266,18 @@ import { AuthNotificationService } from "./infrastructure/mail/auth-notification
       inject: [APPOINTMENT_REPOSITORY],
       useFactory: (appointments: AppointmentRepository) =>
         new GetMyAppointmentsUseCase(appointments),
+    },
+    {
+      provide: ListAdminAppointmentsUseCase,
+      inject: [APPOINTMENT_REPOSITORY],
+      useFactory: (appointments: AppointmentRepository) =>
+        new ListAdminAppointmentsUseCase(appointments),
+    },
+    {
+      provide: UpdateAppointmentStatusUseCase,
+      inject: [APPOINTMENT_REPOSITORY],
+      useFactory: (appointments: AppointmentRepository) =>
+        new UpdateAppointmentStatusUseCase(appointments),
     },
     {
       provide: AuthApplicationService,
