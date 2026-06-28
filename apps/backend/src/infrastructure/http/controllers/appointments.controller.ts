@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -18,6 +20,8 @@ import {
   createPublicAppointmentRequestSchema,
   getAppointmentCalendarQuerySchema,
   getAvailableSlotsQuerySchema,
+  updateAppointmentStatusSchema,
+  type AdminAppointmentDto,
   type AppointmentCalendarDto,
   type AppointmentDto,
   type AvailableSlotsDto,
@@ -26,6 +30,7 @@ import {
   type GetAppointmentCalendarQuery,
   type GetAvailableSlotsQuery,
   type PublicAppointmentRequestDto,
+  type UpdateAppointmentStatusInput,
 } from "@caninany/shared";
 
 import { CreateAppointmentUseCase } from "../../../application/use-cases/create-appointment.use-case";
@@ -33,6 +38,8 @@ import { CreatePublicAppointmentRequestUseCase } from "../../../application/use-
 import { GetAppointmentCalendarUseCase } from "../../../application/use-cases/get-appointment-calendar.use-case";
 import { GetAvailableSlotsUseCase } from "../../../application/use-cases/get-available-slots.use-case";
 import { GetMyAppointmentsUseCase } from "../../../application/use-cases/get-my-appointments.use-case";
+import { ListAdminAppointmentsUseCase } from "../../../application/use-cases/list-admin-appointments.use-case";
+import { UpdateAppointmentStatusUseCase } from "../../../application/use-cases/update-appointment-status.use-case";
 import type { AuthenticatedUser } from "../../auth/authenticated-user";
 import { CurrentUser } from "../../auth/current-user.decorator";
 import { JwtAuthGuard } from "../../auth/jwt-auth.guard";
@@ -49,6 +56,8 @@ export class AppointmentsController {
     private readonly getCalendar: GetAppointmentCalendarUseCase,
     private readonly getAvailableSlots: GetAvailableSlotsUseCase,
     private readonly getMyAppointments: GetMyAppointmentsUseCase,
+    private readonly listAdminAppointments: ListAdminAppointmentsUseCase,
+    private readonly updateAppointmentStatus: UpdateAppointmentStatusUseCase,
   ) {}
 
   @Get("calendar")
@@ -78,6 +87,28 @@ export class AppointmentsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AppointmentDto[]> {
     return this.getMyAppointments.execute(user.id);
+  }
+
+  @Get("admin")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin")
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: "Appointments for administration." })
+  listAdmin(): Promise<AdminAppointmentDto[]> {
+    return this.listAdminAppointments.execute();
+  }
+
+  @Patch("admin/:id/status")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin")
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: "Appointment status updated." })
+  updateStatus(
+    @Param("id") id: string,
+    @Body(new ZodValidationPipe(updateAppointmentStatusSchema))
+    input: UpdateAppointmentStatusInput,
+  ): Promise<AdminAppointmentDto> {
+    return this.updateAppointmentStatus.execute(id, input.status);
   }
 
   @Post("requests")
